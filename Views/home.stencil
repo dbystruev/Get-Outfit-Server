@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h1>Welcome to Get Outfit!</h1>
+<form action="stylist">
+    <label>Stylist id:</label>
+    <input name="subid" type="text">
+    <input type="submit">
+</form>
+</body>
+</html>
