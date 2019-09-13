@@ -1,3 +1,3 @@
 # Server
 
-A description of this package.
+Generate Admitad subid links.
