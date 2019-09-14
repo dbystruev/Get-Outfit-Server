@@ -6,15 +6,32 @@
 
 import Foundation
 
-class XMLManager {
-    // MARK: Errors
-    enum LoadErrors: Error {
-        case invalidLocalURL
-        case invalidRemoteURL
-        case noRemoteData
+class XMLManager: NSObject {
+    // MARK: - Errors
+    enum Errors: Error {
+        case cantCreateXMLParser(URL)
+        case invalidLocalURL(String)
+        case invalidRemoteURL(String)
+        case noRemoteData(URL)
+        
+        var localizedDescription: String {
+            switch self {
+            case .cantCreateXMLParser(let url):
+                return "Can't create XML parser for \(url.path)"
+            case .invalidLocalURL(let path):
+                return "Invalid local URL \(path)"
+            case .invalidRemoteURL(let path):
+                return "Invalid remote URL \(path)"
+            case .noRemoteData(let url):
+                return "No remote data at \(url.path)"
+            }
+        }
     }
     
-    // MARK: Stored Properties
+    // MARK: - Stored Properties
+    var elements = [String: (begin: Int, end: Int, level: Int)]()
+    var level = 0
+    
     var remotePath = "http://export.admitad.com/ru/webmaster/websites/838792/products/export_adv_products/"
     
     var remoteParameters = [
@@ -29,7 +46,7 @@ class XMLManager {
     let localPath = "XML/full.xml"
     let localIncrementalUpdatePath = "XML/update.xml"
     
-    // MARK: Computed Properties
+    // MARK: - Computed Properties
     var isLoaded: Bool {
         guard let fullPath = localURL?.path else { return false }
         var isDirectory = ObjCBool(true)
@@ -43,15 +60,43 @@ class XMLManager {
         return urls.first?.appendingPathComponent(localPath)
     }
     
-    // MARK: Methods
-    func saveRemote(completion: @escaping (Error?) -> Void) {
+    // MARK: - Methods
+    func parse(completion: @escaping (YMLCatalog?, Error?) -> Void) {
+        if isLoaded {
+            parseLoaded(completion: completion)
+        } else {
+            updateFromRemote { error in
+                guard error == nil else {
+                    completion(nil, error)
+                    return
+                }
+                self.parseLoaded(completion: completion)
+            }
+        }
+    }
+    
+    func parseLoaded(completion: @escaping (YMLCatalog?, Error?) -> Void) {
         guard let localURL = localURL else {
-            completion(LoadErrors.invalidLocalURL)
+            completion(nil, Errors.invalidLocalURL(localPath))
+            return
+        }
+        guard let parser = XMLParser(contentsOf: localURL) else {
+            completion(nil, Errors.cantCreateXMLParser(localURL))
+            return
+        }
+        
+        parser.delegate = self
+        parser.parse()
+    }
+    
+    func updateFromRemote(completion: @escaping (Error?) -> Void) {
+        guard let localURL = localURL else {
+            completion(Errors.invalidLocalURL(localPath))
             return
         }
         
         guard let url = URL(string: remotePath)?.withQueries(remoteParameters) else {
-            completion(LoadErrors.invalidRemoteURL)
+            completion(Errors.invalidRemoteURL(remotePath))
             return
         }
         
@@ -62,7 +107,7 @@ class XMLManager {
             }
             
             guard let data = data else {
-                completion(LoadErrors.noRemoteData)
+                completion(Errors.noRemoteData(url))
                 return
             }
             

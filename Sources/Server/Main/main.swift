@@ -11,23 +11,11 @@ import LoggerAPI
 HeliumLogger.use(.info)
 
 let xmlManager = XMLManager()
-if xmlManager.isLoaded {
-    if let xmlPath = xmlManager.localURL?.path {
-        Log.info("XML data is already loaded to \(xmlPath)")
+xmlManager.parse { catalog, error in
+    if let error = error {
+        Log.error(error.localizedDescription)
     } else {
-        Log.info("XML data is already loaded")
-    }
-} else {
-    xmlManager.saveRemote { error in
-        if let xmlURL = xmlManager.localURL, error == nil {
-            Log.info("Loaded XML data to \(xmlURL.path)")
-        } else {
-            if let error = error {
-                Log.error(error.localizedDescription)
-            } else {
-                Log.error("Can't load XML data")
-            }
-        }
+        Log.info("Finished parsing")
     }
 }
 
