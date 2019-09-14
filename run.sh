@@ -30,6 +30,7 @@ killall Server >> "$LOG" 2>&1
 .build/$SCHEME/Server >> "$LOG" 2>&1 &
 
 # Compile new codebase
+swift package clean
 swift build -c $SCHEME >> "$LOG" 2>&1
 
 # Stop running server again

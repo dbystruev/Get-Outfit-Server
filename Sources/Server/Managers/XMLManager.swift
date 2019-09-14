@@ -29,8 +29,13 @@ class XMLManager: NSObject {
     }
     
     // MARK: - Stored Properties
+    #if DEBUG
     var elements = [String: (begin: Int, end: Int, level: Int)]()
     var level = 0
+    #endif
+    
+    var processedElements = [XMLElement]()
+    var rootElement: XMLElement?
     
     var remotePath = "http://export.admitad.com/ru/webmaster/websites/838792/products/export_adv_products/"
     
