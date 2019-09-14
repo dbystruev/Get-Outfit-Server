@@ -1,0 +1,5 @@
+<!DOCTYPE html>
+<html>
+<title>Links for Stylist with SubID: {{ stylist }}</title>
+<body>
+<h1>Links for Stylist with SubID: {{ stylist }}</h1>

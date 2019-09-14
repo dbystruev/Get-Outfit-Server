@@ -1,3 +1,4 @@
+stylist="{{ subid }}"
 if [ $# -ne 1 ]
 then echo OVERVIEW: Make Admitad links for stylists as Stencil HTML.
 	echo
@@ -5,11 +6,11 @@ then echo OVERVIEW: Make Admitad links for stylists as Stencil HTML.
 	echo
 	echo "	<links-file> should list affiliate links, one by line."
 	echo "	Lines without 'http' inside are ignored."
-	echo "	?subid={{ subid }} or &subid={{ subid }} is added at the end of each url."
+	echo "	?subid=$stylist or &subid=$stylist is added at the end of each url."
 	echo
 	exit 1
 fi
-stylist="{{ subid }}"
+cat header.stencil | sed "s/{{ stylist }}/$stylist/"
 cat $1 | while read -r link
 do	if [[ $link == *"http"* ]]
 	then	if [[ $link == *"?"*  ]]
@@ -21,3 +22,4 @@ do	if [[ $link == *"http"* ]]
 			echo "$link<br>"
 	fi
 done
+cat footer.stencil

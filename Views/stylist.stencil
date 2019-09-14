@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
+<title>Links for Stylist with SubID: {{ subid }}</title>
 <body>
 <h1>Links for Stylist with SubID: {{ subid }}</h1>
+<br>
 12storeez<br>
 <a href="https://ad.admitad.com/g/wu8b3ljjplf6f0a2c543f2c509a9d6/?subid={{ subid }}">https://ad.admitad.com/g/wu8b3ljjplf6f0a2c543f2c509a9d6/?subid={{ subid }}</a><br>
 <br>
@@ -269,4 +271,4 @@ Yves Saint Laurent RU<br>
 Zaful WW<br>
 <a href="https://ad.admitad.com/g/5fdvtbwddef6f0a2c543e1c974a806/?subid={{ subid }}">https://ad.admitad.com/g/5fdvtbwddef6f0a2c543e1c974a806/?subid={{ subid }}</a><br>
 </body>
-</html><br>
+</html>
