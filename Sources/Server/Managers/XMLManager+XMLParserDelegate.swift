@@ -87,8 +87,8 @@ extension XMLManager: XMLParserDelegate {
         }
         
         #if DEBUG
-        Log.info("Root Element: \(rootElement)")
-        Log.info("Parsed \(elements.count) unique elements:")
+        Log.debug("Root Element: \(rootElement)")
+        Log.debug("Parsed \(elements.count) unique elements:")
         
         for (key, value) in elements.sorted(by: { leftElement, rightElement in
             let leftLevel = leftElement.value.level
@@ -101,7 +101,7 @@ extension XMLManager: XMLParserDelegate {
         }) {
             let tabs = String(repeating: "\t", count: value.level)
             let counter = value.begin == value.end ? "\(value.begin)" : "\(value)"
-            Log.info("\(tabs)\(key): \(counter)", functionName: "", fileName: "")
+            Log.debug("\(tabs)\(key): \(counter)", functionName: "", fileName: "")
         }
         #endif
         

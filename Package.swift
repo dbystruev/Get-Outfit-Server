@@ -8,13 +8,14 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/IBM-Swift/HeliumLogger.git", .upToNextMajor(from: "1.9.0")),
         .package(url: "https://github.com/IBM-Swift/Kitura.git", .upToNextMajor(from: "2.8.1")),
+        .package(url: "https://github.com/IBM-Swift/Kitura-redis.git", .upToNextMajor(from: "2.1.1")),
         .package(url: "https://github.com/IBM-Swift/Kitura-StencilTemplateEngine.git", .upToNextMajor(from: "1.11.1")),
         .package(url: "https://github.com/IBM-Swift/swift-html-entities.git", .upToNextMajor(from: "3.0.13")),
     ],
     targets: [
         .target(
             name: "Server",
-            dependencies: ["HeliumLogger", "HTMLEntities", "Kitura" , "KituraStencil"]),
+            dependencies: ["HeliumLogger", "HTMLEntities", "Kitura" , "KituraStencil", "SwiftRedis"]),
         .testTarget(
             name: "ServerTests",
             dependencies: ["Server"]),

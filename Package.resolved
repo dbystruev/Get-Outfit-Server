@@ -47,6 +47,15 @@
         }
       },
       {
+        "package": "SwiftRedis",
+        "repositoryURL": "https://github.com/IBM-Swift/Kitura-redis.git",
+        "state": {
+          "branch": null,
+          "revision": "c9d45f6f0bf4bf627942fdbf6316b91af91610a2",
+          "version": "2.1.1"
+        }
+      },
+      {
         "package": "KituraStencil",
         "repositoryURL": "https://github.com/IBM-Swift/Kitura-StencilTemplateEngine.git",
         "state": {

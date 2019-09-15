@@ -7,20 +7,22 @@
 import HeliumLogger
 import Kitura
 import LoggerAPI
+import SwiftRedis
 
+#if DEBUG
+HeliumLogger.use(.debug)
+#else
 HeliumLogger.use(.info)
+#endif
 
-let xmlManager = XMLManager()
-xmlManager.parse { catalog, error in
-    if let error = error {
-        Log.error(error.localizedDescription)
-    } else {
-        Log.info("Finished parsing")
-    }
-}
+let catalog = YMLCatalog()
+setup(catalog)
+
+let redis = Redis()
+setup(redis)
 
 let router = Router()
-setupRoutes(for: router)
+setup(router)
 
 Kitura.addHTTPServer(onPort: 8080, with: router)
 Kitura.run()
