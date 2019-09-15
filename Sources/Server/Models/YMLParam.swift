@@ -26,12 +26,17 @@ extension YMLParam: XMLElement {
         }
     }
     
-    var elementName: String {
-        return "param"
+    var characters: String {
+        get {
+            return value ?? ""
+        }
+        set {
+            value = newValue
+        }
     }
     
-    mutating func foundCharacters(_ string: String) {
-        value = (value ?? "") + string
+    var elementName: String {
+        return "param"
     }
 }
 

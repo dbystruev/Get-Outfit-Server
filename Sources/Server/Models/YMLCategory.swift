@@ -26,12 +26,13 @@ extension YMLCategory: XMLElement {
         }
     }
     
-    var elementName: String {
-        return "category"
+    var characters: String {
+        get { return name ?? "" }
+        set { name = newValue }
     }
     
-    mutating func foundCharacters(_ string: String) {
-        name = (name ?? "") + string
+    var elementName: String {
+        return "category"
     }
 }
 

@@ -5,6 +5,7 @@
 //
 
 import Foundation
+import HTMLEntities
 import LoggerAPI
 
 extension XMLManager: XMLParserDelegate {
@@ -18,7 +19,12 @@ extension XMLManager: XMLParserDelegate {
     }
     
     func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String] = [:]) {
-        let newElement = GenericXMLElement.createElement(withName: elementName, attributes: attributeDict)
+        var unescapedAttributes = [String: String]()
+        for (key, value) in attributeDict {
+            unescapedAttributes[key] = value.htmlUnescape()
+        }
+        
+        let newElement = GenericXMLElement.createElement(withName: elementName, attributes: unescapedAttributes)
         processedElements.append(newElement)
         
         #if DEBUG
@@ -37,21 +43,22 @@ extension XMLManager: XMLParserDelegate {
     }
     
     func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
-        if processedElements.last?.elementName == elementName {
-            let currentElement = processedElements.removeLast()
-            if processedElements.isEmpty {
-                rootElement = currentElement
-            } else {
-                var lastElement = processedElements.removeLast()
-                lastElement.addChild(currentElement)
-                processedElements.append(lastElement)
-            }
+        if processedElements.isEmpty {
+            Log.error("Ending \(elementName) has no starting element")
         } else {
-            let level = processedElements.count
-            if let lastElement = processedElements.last {
-                Log.error("Starting \(lastElement) does not match ending \(elementName), level: \(level)")
+            var currentElement = processedElements.removeLast()
+            if currentElement.elementName == elementName {
+                currentElement.characters = currentElement.characters.htmlUnescape()
+                if processedElements.isEmpty {
+                    rootElement = currentElement
+                } else {
+                    var lastElement = processedElements.removeLast()
+                    lastElement.addChild(currentElement)
+                    processedElements.append(lastElement)
+                }
             } else {
-                Log.error("Ending \(elementName) has no starting element, level \(level)")
+                let level = processedElements.count + 1
+                Log.error("Starting \(currentElement) does not match ending \(elementName), level: \(level)")
             }
         }
         

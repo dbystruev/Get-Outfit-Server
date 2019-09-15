@@ -6,7 +6,7 @@
 
 protocol XMLElement {
     var attributes: [String: String] { get set }
-    var characters: String { get }
+    var characters: String { get set }
     var children: [XMLElement] { get }
     var elementName: String { get }
     mutating func addChild(_ child: XMLElement)
@@ -38,8 +38,16 @@ extension XMLElement {
         set {}
     }
     
-    var characters: String { return "" }
+    var characters: String {
+        get { return "" }
+        set {}
+    }
+    
     var children: [XMLElement] { return [] }
+    
     mutating func addChild(_ child: XMLElement) {}
-    mutating func foundCharacters(_ string: String) {}
+    
+    mutating func foundCharacters(_ string: String) {
+        characters += string
+    }
 }

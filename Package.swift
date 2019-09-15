@@ -6,17 +6,15 @@ import PackageDescription
 let package = Package(
     name: "Server",
     dependencies: [
-        .package(url: "https://github.com/IBM-Swift/Kitura.git", .upToNextMinor(from: "2.8.1")),
-        .package(url: "https://github.com/IBM-Swift/HeliumLogger.git", .upToNextMinor(from: "1.9.0")),
-        .package(
-            url: "https://github.com/IBM-Swift/Kitura-StencilTemplateEngine.git",
-            .upToNextMinor(from: "1.11.1")
-        ),
+        .package(url: "https://github.com/IBM-Swift/HeliumLogger.git", .upToNextMajor(from: "1.9.0")),
+        .package(url: "https://github.com/IBM-Swift/Kitura.git", .upToNextMajor(from: "2.8.1")),
+        .package(url: "https://github.com/IBM-Swift/Kitura-StencilTemplateEngine.git", .upToNextMajor(from: "1.11.1")),
+        .package(url: "https://github.com/IBM-Swift/swift-html-entities.git", .upToNextMajor(from: "3.0.13")),
     ],
     targets: [
         .target(
             name: "Server",
-            dependencies: ["Kitura" , "HeliumLogger", "KituraStencil"]),
+            dependencies: ["HeliumLogger", "HTMLEntities", "Kitura" , "KituraStencil"]),
         .testTarget(
             name: "ServerTests",
             dependencies: ["Server"]),
