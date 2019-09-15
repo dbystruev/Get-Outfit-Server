@@ -60,3 +60,25 @@ extension YMLShop: XMLElement {
         }
     }
 }
+
+#if DEBUG
+// MARK: - CustomStringConvertible
+extension YMLShop: CustomStringConvertible {
+    var description: String {
+        var properties = ""
+        if let title = title { properties += "title: \"\(title)\", " }
+        if let company = company { properties += "company: \"\(company)\", " }
+        if let url = url { properties += "url: \"\(url)\", " }
+        if !categories.isEmpty { properties += "categories: \(categories.count) (last: \(categories.last!)), " }
+        if !currencies.isEmpty { properties += "currencies: \(currencies), " }
+        if !offers.isEmpty { properties += "offers: \(offers.count) (last: \(offers.last!), " }
+        
+        let name = "\(YMLShop.self)"
+        if properties.isEmpty {
+            return name
+        } else {
+            return "\(name)(\(properties.dropLast(2)))"
+        }
+    }
+}
+#endif

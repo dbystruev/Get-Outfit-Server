@@ -17,13 +17,13 @@ class XMLManager: NSObject {
         var localizedDescription: String {
             switch self {
             case .cantCreateXMLParser(let url):
-                return "Can't create XML parser for \(url.path)"
+                return "Can't create XML parser for \(url)"
             case .invalidLocalURL(let path):
                 return "Invalid local URL \(path)"
             case .invalidRemoteURL(let path):
                 return "Invalid remote URL \(path)"
             case .noRemoteData(let url):
-                return "No remote data at \(url.path)"
+                return "No remote data at \(url)"
             }
         }
     }

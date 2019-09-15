@@ -66,9 +66,11 @@ extension XMLManager: XMLParserDelegate {
     func parserDidEndDocument(_ parser: XMLParser) {
         if processedElements.isEmpty {
             if let rootElement = rootElement {
+                #if DEBUG
                 Log.info("Root Element: \(rootElement.elementName)")
                 Log.info("Attributes: \(rootElement.attributes)")
                 Log.info("Children: \(rootElement.children)")
+                #endif
             } else {
                 Log.error("No root element")
             }

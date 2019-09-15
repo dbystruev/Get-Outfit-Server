@@ -20,12 +20,16 @@ extension XMLElement {
             return YMLCategory(attributes: attributes)
         case "currency":
             return YMLCurrency(attributes: attributes)
+        case "offer":
+            return YMLOffer(attributes: attributes)
+        case "param":
+            return YMLParam(attributes: attributes)
         case "shop":
             return YMLShop()
         case "yml_catalog":
             return YMLCatalog(attributes: attributes)
         default:
-            return GenericXMLElement(elementName: name)
+            return GenericXMLElement(attributes: attributes, elementName: name)
         }
     }
     
