@@ -18,6 +18,8 @@ extension XMLElement {
         switch name {
         case "category":
             return YMLCategory(attributes: attributes)
+        case "currency":
+            return YMLCurrency(attributes: attributes)
         case "shop":
             return YMLShop()
         case "yml_catalog":

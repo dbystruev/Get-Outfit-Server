@@ -5,7 +5,7 @@
 //
 
 struct GenericXMLElement: XMLElement {
-    var attributes = [String: String]()
+    var attributes: [String: String]
     var characters = ""
     var children: [XMLElement]
     var elementName: String

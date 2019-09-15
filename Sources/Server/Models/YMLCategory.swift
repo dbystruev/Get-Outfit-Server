@@ -16,8 +16,8 @@ extension YMLCategory: XMLElement {
     var attributes: [String : String] {
         get {
             var attributes = [String: String]()
-            attributes["id"] = id == nil ? nil : "\(id!)"
-            attributes["parendId"] = parentId == nil ? nil : "\(parentId!)"
+            if let id = id { attributes["id"] = "\(id)" }
+            if let parentId = parentId { attributes["parentId"] = "\(parentId)" }
             return attributes
         }
         set {

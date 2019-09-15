@@ -7,6 +7,7 @@
 // <name> replaced with <title>
 
 import Foundation
+import LoggerAPI
 
 struct YMLShop: Codable {
     var title: String?
@@ -19,6 +20,11 @@ struct YMLShop: Codable {
 
 // MARK: - XMLElement
 extension YMLShop: XMLElement {
+    var children: [XMLElement] {
+        Log.error("Not implemented")
+        return []
+    }
+    
     var elementName: String {
         return "shop"
     }
