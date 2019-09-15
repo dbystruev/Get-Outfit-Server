@@ -30,6 +30,6 @@ Categories and offers can be filtered by its fields.
 
 ## HTML Routes
 - [/](http://server.getoutfit.ru)
-- [/stylist](http://server.getoutfit.ru/stylist)
+- [/stylist](http://server.getoutfit.ru/stylist?subid=app)
 
 Stylist should be given a subid parameter.
