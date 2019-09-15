@@ -24,10 +24,7 @@ extension YMLCatalog: XMLElement {
         }
         set {
             guard let dateString = newValue["date"] else { return }
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-            guard let date = formatter.date(from: dateString) else { return }
-            self.date = date
+            self.date = dateString.toDate
         }
     }
     

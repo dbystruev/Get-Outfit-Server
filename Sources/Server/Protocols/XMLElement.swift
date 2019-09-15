@@ -9,6 +9,7 @@ protocol XMLElement {
     var characters: String { get set }
     var children: [XMLElement] { get }
     var elementName: String { get }
+    
     mutating func addChild(_ child: XMLElement)
     mutating func foundCharacters(_ string: String)
 }

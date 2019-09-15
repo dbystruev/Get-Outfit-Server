@@ -71,22 +71,25 @@ extension XMLManager: XMLParserDelegate {
     }
     
     func parserDidEndDocument(_ parser: XMLParser) {
-        if processedElements.isEmpty {
-            if let rootElement = rootElement {
-                #if DEBUG
-                Log.info("Root Element: \(rootElement.elementName)")
-                Log.info("Attributes: \(rootElement.attributes)")
-                Log.info("Children: \(rootElement.children)")
-                #endif
-            } else {
-                Log.error("No root element")
-            }
-        } else {
-            Log.error("\(processedElements.count) elements not matched: \(processedElements)")
+        guard processedElements.isEmpty else {
+            completion?(nil, Errors.notMatchedElements(processedElements))
+            return
+        }
+        
+        guard let rootElement = rootElement else {
+            completion?(nil, Errors.noRootElement)
+            return
+        }
+        
+        guard let catalog = rootElement as? YMLCatalog else {
+            completion?(nil, Errors.rootElementIsNotYMLCatalog(rootElement))
+            return
         }
         
         #if DEBUG
+        Log.info("Root Element: \(rootElement)")
         Log.info("Parsed \(elements.count) unique elements:")
+        
         for (key, value) in elements.sorted(by: { leftElement, rightElement in
             let leftLevel = leftElement.value.level
             let rightLevel = rightElement.value.level
@@ -101,5 +104,7 @@ extension XMLManager: XMLParserDelegate {
             Log.info("\(tabs)\(key): \(counter)", functionName: "", fileName: "")
         }
         #endif
+        
+        completion?(catalog, nil)
     }
 }

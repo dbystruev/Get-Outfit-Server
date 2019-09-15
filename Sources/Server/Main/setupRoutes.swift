@@ -1,5 +1,5 @@
 //
-//  routes.swift
+//  setupRoutes.swift
 //
 //  Created by Denis Bystruev on 13/09/2019.
 //

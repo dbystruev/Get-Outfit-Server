@@ -8,13 +8,16 @@ import Foundation
 
 class XMLManager: NSObject {
     // MARK: - Errors
-    enum Errors: Error {
+    enum Errors: Swift.Error {
         case cantCreateXMLParser(URL)
         case invalidLocalURL(String)
         case invalidRemoteURL(String)
         case noRemoteData(URL)
+        case noRootElement
+        case notMatchedElements([XMLElement])
+        case rootElementIsNotYMLCatalog(XMLElement)
         
-        var localizedDescription: String {
+        var description: String {
             switch self {
             case .cantCreateXMLParser(let url):
                 return "Can't create XML parser for \(url)"
@@ -24,6 +27,12 @@ class XMLManager: NSObject {
                 return "Invalid remote URL \(path)"
             case .noRemoteData(let url):
                 return "No remote data at \(url)"
+            case .noRootElement:
+                return "No root element found"
+            case .notMatchedElements(let elements):
+                return "\(elements.count) element(s) not matched: \(elements)"
+            case .rootElementIsNotYMLCatalog(let element):
+                return "Root element is not a YMLCatalog: \(element)"
             }
         }
     }
@@ -34,6 +43,7 @@ class XMLManager: NSObject {
     var level = 0
     #endif
     
+    var completion: ((YMLCatalog?, Error?) -> Void)?
     var processedElements = [XMLElement]()
     var rootElement: XMLElement?
     
@@ -90,6 +100,7 @@ class XMLManager: NSObject {
             return
         }
         
+        self.completion = completion
         parser.delegate = self
         parser.parse()
     }
