@@ -74,14 +74,28 @@ func setup(_ router: Router) {
         if let parentId = request.queryParameters["parentId"] {
             categories = categories?.filter { $0.parentId == Int(parentId) }
         }
-        response.send(json: categories)
+        
+        // MARK: "count"
+        if request.queryParameters["count"] == nil {
+            response.send(json: categories)
+        } else {
+            response.send(json: ["count": categories?.count])
+        }
+        
         next()
     }
     
     // MARK: - GET /currencies
     router.get("currencies") { request, response, next in
         let currencies = catalog.shop?.currencies
-        response.send(json: currencies)
+        
+        // MARK: "count"
+        if request.queryParameters["count"] == nil {
+            response.send(json: currencies)
+        } else {
+            response.send(json: ["count": currencies?.count])
+        }
+        
         next()
     }
     
@@ -266,19 +280,38 @@ func setup(_ router: Router) {
             offers = offers?.filter { $0.vendorCode?.lowercased() == vendorCode.lowercased() }
         }
         
-        response.send(json: offers)
+        // MARK: "count"
+        if request.queryParameters["count"] == nil {
+            response.send(json: offers)
+        } else {
+            response.send(json: ["count": offers?.count])
+        }
+        
         next()
     }
     
     // MARK: - GET /params
     router.get("params") { request, response, next in
+        let isNotCounting = request.queryParameters["count"] == nil
         let offers = catalog.shop?.offers
+        
         if let paramNames = offers?.flatMap({ $0.params.compactMap({ param in param.name?.lowercased() }) }) {
             let names = Set(paramNames)
-            response.send(json: names)
+            
+            // MARK: "count"
+            if isNotCounting {
+                response.send(json: names)
+            } else {
+                response.send(json: ["count": names.count])
+            }
         } else {
-            response.send("[]")
+            if isNotCounting {
+                response.send(json: Set<String>())
+            } else {
+                response.send(json: ["count": 0])
+            }
         }
+        
         next()
     }
 
