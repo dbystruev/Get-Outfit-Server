@@ -42,6 +42,7 @@ extension YMLCatalog: XMLElement {
             self.shop = shop
         }
     }
+
 }
 
 extension YMLCatalog {

@@ -46,8 +46,89 @@ extension YMLOffer: XMLElement {
     }
     
     var children: [XMLElement] {
-        Log.error("Not implemented")
-        return []
+        var children = [XMLElement]()
+        
+        if let categoryId = categoryId {
+            children.append(GenericXMLElement(characters: "\(categoryId)", elementName: "categoryId"))
+        }
+        
+        if let currencyId = currencyId {
+            children.append(GenericXMLElement(characters: currencyId, elementName: "currencyId"))
+        }
+        
+        if let description = description {
+            children.append(GenericXMLElement(characters: description, elementName: "description"))
+        }
+        
+        if let manufacturer_warranty = manufacturer_warranty {
+            children.append(GenericXMLElement(
+                characters: "\(manufacturer_warranty)",
+                elementName: "manufacturer_warranty"
+            ))
+        }
+        
+        if let model = model {
+            children.append(GenericXMLElement(characters: model, elementName: "model"))
+        }
+        
+        if let modified_time = modified_time {
+            children.append(GenericXMLElement(
+                characters: "\(modified_time.timeIntervalSince1970)",
+                elementName: "modified_time"
+            ))
+        }
+        
+        if let name = name {
+            children.append(GenericXMLElement(characters: name, elementName: "name"))
+        }
+        
+        if let oldprice = oldprice {
+            children.append(GenericXMLElement(characters: "\(oldprice)", elementName: "oldprice"))
+        }
+        
+        #if DEBUG
+        Log.debug("\(children.count), params = \(params.count)")
+        #endif
+        
+        params.forEach { children.append($0) }
+        
+        #if DEBUG
+        Log.debug("\(children.count), pictures = \(pictures.count)")
+        #endif
+        
+        pictures.forEach { url in
+            children.append(GenericXMLElement(characters: url.absoluteString, elementName: "picture"))
+        }
+        
+        #if DEBUG
+        Log.debug("\(children.count)")
+        #endif
+        
+        if let price = price {
+            children.append(GenericXMLElement(characters: "\(price)", elementName: "price"))
+        }
+        
+        if let sales_notes = sales_notes {
+            children.append(GenericXMLElement(characters: sales_notes, elementName: "sales_notes"))
+        }
+        
+        if let typePrefix = typePrefix {
+            children.append(GenericXMLElement(characters: typePrefix, elementName: "typePrefix"))
+        }
+        
+        if let url = url {
+            children.append(GenericXMLElement(characters: url.absoluteString, elementName: "url"))
+        }
+        
+        if let vendor = vendor {
+            children.append(GenericXMLElement(characters: vendor, elementName: "vendor"))
+        }
+        
+        if let vendorCode = vendorCode {
+            children.append(GenericXMLElement(characters: vendorCode, elementName: "vendorCode"))
+        }
+        
+        return children
     }
     
     var elementName: String {

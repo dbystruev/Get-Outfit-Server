@@ -12,6 +12,7 @@ protocol XMLElement {
     
     mutating func addChild(_ child: XMLElement)
     mutating func foundCharacters(_ string: String)
+    mutating func update(with element: XMLElement)
 }
 
 extension XMLElement {
@@ -50,5 +51,11 @@ extension XMLElement {
     
     mutating func foundCharacters(_ string: String) {
         characters += string
+    }
+    
+    mutating func update(with element: XMLElement) {
+//        attributes.merge(element.attributes) { old, new in new }
+//        characters = element.characters
+        // TODO: TO BE CONTINUED
     }
 }

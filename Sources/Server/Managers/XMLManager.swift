@@ -5,11 +5,13 @@
 //
 
 import Foundation
+import LoggerAPI
 
 class XMLManager: NSObject {
     // MARK: - Errors
     enum Errors: Swift.Error {
         case cantCreateXMLParser(URL)
+        case emptyCatalog
         case invalidLocalURL(String)
         case invalidRemoteURL(String)
         case noRemoteData(URL)
@@ -21,6 +23,8 @@ class XMLManager: NSObject {
             switch self {
             case .cantCreateXMLParser(let url):
                 return "Can't create XML parser for \(url)"
+            case .emptyCatalog:
+                return "Catalogue is empty"
             case .invalidLocalURL(let path):
                 return "Invalid local URL \(path)"
             case .invalidRemoteURL(let path):
@@ -58,8 +62,7 @@ class XMLManager: NSObject {
         "user": "Kimsanzhiev",
     ]
     
-    let localPath = "XML/full.xml"
-    let localIncrementalUpdatePath = "XML/update.xml"
+    var localPath: String?
     
     // MARK: - Computed Properties
     var isLoaded: Bool {
@@ -70,14 +73,35 @@ class XMLManager: NSObject {
         return fileExists && isReadable && !isDirectory.boolValue
     }
     
+    var lastImport: Date? {
+        get {
+            guard let lastImport = remoteParameters["last_import"] else { return nil }
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy.MM.dd.HH.mm"
+            return formatter.date(from: lastImport)
+        }
+        set {
+            guard let date = newValue else { return }
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy.MM.dd.HH.mm"
+            remoteParameters["last_import"] = formatter.string(from: date)
+        }
+    }
+    
     var localURL: URL? {
         let urls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        guard let localPath = localPath else { return nil }
         return urls.first?.appendingPathComponent(localPath)
     }
     
     // MARK: - Methods
-    func parse(completion: @escaping (YMLCatalog?, Error?) -> Void) {
+    func loadAndParse(using localPath: String, completion: @escaping (YMLCatalog?, Error?) -> Void) {
+        self.localPath = localPath
         if isLoaded {
+            #if DEBUG
+            Log.debug("Found local \(localPath)")
+            #endif
+            
             parseLoaded(completion: completion)
         } else {
             updateFromRemote { error in
@@ -92,7 +116,7 @@ class XMLManager: NSObject {
     
     func parseLoaded(completion: @escaping (YMLCatalog?, Error?) -> Void) {
         guard let localURL = localURL else {
-            completion(nil, Errors.invalidLocalURL(localPath))
+            completion(nil, Errors.invalidLocalURL(localPath ?? "nil"))
             return
         }
         guard let parser = XMLParser(contentsOf: localURL) else {
@@ -107,7 +131,7 @@ class XMLManager: NSObject {
     
     func updateFromRemote(completion: @escaping (Error?) -> Void) {
         guard let localURL = localURL else {
-            completion(Errors.invalidLocalURL(localPath))
+            completion(Errors.invalidLocalURL(localPath ?? "nil"))
             return
         }
         
@@ -115,6 +139,10 @@ class XMLManager: NSObject {
             completion(Errors.invalidRemoteURL(remotePath))
             return
         }
+        
+        #if DEBUG
+        Log.debug(url.absoluteString)
+        #endif
         
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
             guard error == nil else {

@@ -11,21 +11,80 @@ import LoggerAPI
 import SwiftRedis
 
 // MARK: - Setup Catalog
-func setup(_ catalog: YMLCatalog) {
+func setup(completion: @escaping (YMLCatalog?, Error?) -> Void) {
+    
     let xmlManager = XMLManager()
-    xmlManager.parse { parsedCatalog, error in
-        if let error = error {
-            Log.error(error.localizedDescription)
+    
+    func loadCatalog(completion: @escaping (YMLCatalog?, Error?) -> Void) {
+        let decoder = PropertyListDecoder()
+        
+        // MARK: Try to load from UserDefaults
+        if
+            let savedData = UserDefaults.standard.data(forKey: "\(YMLCatalog.self)"),
+            let catalog = try? decoder.decode(YMLCatalog.self, from: savedData)
+        {
+            #if DEBUG
+            Log.debug("Found saved YMLCatalog: \(catalog)")
+            #endif
+            
+            completion(catalog, nil)
             return
         }
         
-        guard let parsedCatalog = parsedCatalog else {
-            Log.error("Didn't get parsed catalogue")
+        // MARK: Try to load into XML file/parse it
+        xmlManager.loadAndParse(using: "XML/full.xml") { catalog, error in
+            if let error = error {
+                completion(nil, error)
+                return
+            }
+            
+            guard let catalog = catalog else {
+                completion(nil, XMLManager.Errors.emptyCatalog)
+                return
+            }
+            
+            #if DEBUG
+            Log.debug("Parsed YMLCatalog from XML: \(catalog)")
+            #endif
+            
+            let encoder = PropertyListEncoder()
+            guard let encodedCatalog = try? encoder.encode(catalog) else {
+                Log.error("Can't encode \(catalog)")
+                completion(catalog, nil)
+                return
+            }
+            
+            UserDefaults.standard.set(encodedCatalog, forKey: "\(YMLCatalog.self)")
+            completion(catalog, nil)
+        }
+    }
+    
+    func updateCatalog(completion: @escaping (YMLCatalog?, Error?) -> Void) {
+        xmlManager.loadAndParse(using: "XML/update.xml", completion: completion)
+    }
+    
+    loadCatalog { loadedCatalog, error in
+        guard var catalog = loadedCatalog, error == nil else {
+            completion(loadedCatalog, error)
             return
         }
         
-        catalog.date = parsedCatalog.date
-        catalog.shop = parsedCatalog.shop
+        let yesterday = Date().addingTimeInterval(-86400)
+        
+        if let catalogDate = catalog.date, catalogDate < yesterday {
+            xmlManager.lastImport = catalogDate
+            updateCatalog { updatedCatalog, error in
+                if let error = error {
+                    Log.error(error.localizedDescription)
+                }
+                if let updatedCatalog = updatedCatalog {
+                    catalog.update(with: updatedCatalog)
+                }
+                completion(catalog, nil)
+            }
+        } else {
+            completion(catalog, nil)
+        }
     }
 }
 
@@ -49,11 +108,11 @@ func setup(_ redis: Redis) {
 // MARK: - Setup Router
 func setup(_ router: Router) {
     router.setDefault(templateEngine: StencilTemplateEngine())
-
+    
     // MARK: - GET /
     router.get("/") { request, response, next in
-       try response.render("home", context: [:])
-       next()
+        try response.render("home", context: [:])
+        next()
     }
     
     // MARK: - GET /categories
@@ -314,16 +373,16 @@ func setup(_ router: Router) {
         
         next()
     }
-
+    
     // MARK: - GET /stylist
     router.get("stylist") { request, response, next in
         guard let subid = request.queryParameters["subid"] else {
             try response.status(.badRequest).end()
             return
         }
-
+        
         Log.info("Generated links for subid: \(subid)")
-
+        
         try response.render("stylist", context: ["subid": subid])
         
         next()

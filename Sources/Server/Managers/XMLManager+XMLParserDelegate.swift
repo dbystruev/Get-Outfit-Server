@@ -53,6 +53,11 @@ extension XMLManager: XMLParserDelegate {
                     rootElement = currentElement
                 } else {
                     var lastElement = processedElements.removeLast()
+                    
+//                    #if DEBUG
+//                    Log.debug("lastElement.addChild(\(currentElement))")
+//                    #endif
+                    
                     lastElement.addChild(currentElement)
                     processedElements.append(lastElement)
                 }
@@ -87,7 +92,6 @@ extension XMLManager: XMLParserDelegate {
         }
         
         #if DEBUG
-        Log.debug("Root Element: \(rootElement)")
         Log.debug("Parsed \(elements.count) unique elements:")
         
         for (key, value) in elements.sorted(by: { leftElement, rightElement in
