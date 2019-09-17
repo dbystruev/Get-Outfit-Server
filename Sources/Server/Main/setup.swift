@@ -24,7 +24,10 @@ func setup(completion: @escaping (YMLCatalog?, Error?) -> Void) {
             let catalog = try? decoder.decode(YMLCatalog.self, from: savedData)
         {
             #if DEBUG
-            Log.debug("Found saved YMLCatalog: \(catalog)")
+            Log.debug(
+                "Found local YMLCatalog \(catalog.date?.toString ?? "nil")" +
+                ", offers: \(catalog.shop?.offers.count ?? 0)"
+            )
             #endif
             
             completion(catalog, nil)
@@ -44,7 +47,10 @@ func setup(completion: @escaping (YMLCatalog?, Error?) -> Void) {
             }
             
             #if DEBUG
-            Log.debug("Parsed YMLCatalog from XML: \(catalog)")
+            Log.debug(
+                "Parsed XML YMLCatalog \(catalog.date?.toString ?? "nil")" +
+                ", offers: \(catalog.shop?.offers.count ?? 0)"
+            )
             #endif
             
             let encoder = PropertyListEncoder()
@@ -64,10 +70,17 @@ func setup(completion: @escaping (YMLCatalog?, Error?) -> Void) {
     }
     
     loadCatalog { loadedCatalog, error in
-        guard var catalog = loadedCatalog, error == nil else {
+        guard let catalog = loadedCatalog, error == nil else {
             completion(loadedCatalog, error)
             return
         }
+        
+        #if DEBUG
+        Log.debug(
+            "Loaded YMLCatalog \(catalog.date?.toString ?? "nil")" +
+            ", offers: \(catalog.shop?.offers.count ?? 0)"
+        )
+        #endif
         
         let yesterday = Date().addingTimeInterval(-86400)
         
@@ -80,6 +93,12 @@ func setup(completion: @escaping (YMLCatalog?, Error?) -> Void) {
                 if let updatedCatalog = updatedCatalog {
                     catalog.update(with: updatedCatalog)
                 }
+                #if DEBUG
+                Log.debug(
+                    "Updated YMLCatalog \(catalog.date?.toString ?? "nil")" +
+                    ", offers: \(catalog.shop?.offers.count ?? 0)"
+                )
+                #endif
                 completion(catalog, nil)
             }
         } else {
@@ -210,7 +229,7 @@ func setup(_ router: Router) {
         if let modified_after = request.queryParameters["modified_after"] {
             if let userTime = TimeInterval(modified_after) {
                 offers = offers?.filter { offer in
-                    guard let offerTime = offer.modified_time?.timeIntervalSince1970 else { return false }
+                    guard let offerTime = offer.modified_time else { return false }
                     return userTime <= offerTime
                 }
             }
@@ -220,7 +239,7 @@ func setup(_ router: Router) {
         if let modified_before = request.queryParameters["modified_before"] {
             if let userTime = TimeInterval(modified_before) {
                 offers = offers?.filter { offer in
-                    guard let offerTime = offer.modified_time?.timeIntervalSince1970 else { return false }
+                    guard let offerTime = offer.modified_time else { return false }
                     return offerTime <= userTime
                 }
             }
@@ -228,7 +247,7 @@ func setup(_ router: Router) {
         
         // MARK: "modified_time"
         if let modified_time = request.queryParameters["modified_time"] {
-            offers = offers?.filter { $0.modified_time?.timeIntervalSince1970 == TimeInterval(modified_time) }
+            offers = offers?.filter { $0.modified_time == TimeInterval(modified_time) }
         }
         
         // MARK: "name"
@@ -341,7 +360,20 @@ func setup(_ router: Router) {
         
         // MARK: "count"
         if request.queryParameters["count"] == nil {
-            response.send(json: offers)
+            if
+                request.queryParameters["modified_times"] != nil,
+                let modifiedTimes = offers?.compactMap({ $0.modified_time }),
+                let minTime = modifiedTimes.min(),
+                let maxTime = modifiedTimes.max()
+            {
+                #if DEBUG
+                Log.debug("Min Time: \(minTime), Max Time: \(maxTime)")
+                #endif
+                
+                response.send(json: ["modified_time_min": minTime, "modified_time_max": maxTime])
+            } else {
+                response.send(json: offers)
+            }
         } else {
             response.send(json: ["count": offers?.count])
         }

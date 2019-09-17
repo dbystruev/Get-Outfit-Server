@@ -28,6 +28,11 @@ extension YMLCurrency: XMLElement {
     var elementName: String {
         return "currency"
     }
+    
+    mutating func update(with element: XMLElement) {
+        guard let updatedCurrency = element as? Self, updatedCurrency.id == id else { return }
+        rate = updatedCurrency.rate ?? rate
+    }
 }
 
 extension YMLCurrency {

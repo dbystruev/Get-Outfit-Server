@@ -34,8 +34,16 @@ extension YMLCategory: XMLElement {
     var elementName: String {
         return "category"
     }
+    
+    mutating func update(with element: XMLElement) {
+        guard let updatedCategory = element as? Self, updatedCategory.id == id else { return }
+        
+        name = updatedCategory.name ?? name
+        parentId = updatedCategory.parentId // ?? parentId
+    }
 }
 
+// MARK: - Init
 extension YMLCategory {
     init(attributes: [String : String]) {
         self.attributes = attributes

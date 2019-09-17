@@ -55,6 +55,10 @@ extension YMLShop: XMLElement {
     }
     
     mutating func addChild(_ child: XMLElement) {
+//        #if DEBUG
+//        Log.debug("\(child.elementName), children: \(child.children)")
+//        #endif
+        
         switch child.elementName {
         case "title":
             title = child.characters
@@ -84,6 +88,42 @@ extension YMLShop: XMLElement {
             break
         }
     }
+    
+    mutating func update(with element: XMLElement) {
+        guard let updatedShop = element as? Self else { return }
+        
+        title = updatedShop.title ?? title
+        company = updatedShop.company ?? company
+        url = updatedShop.url ?? url
+        
+        for updatedCategory in updatedShop.categories {
+            if let index = categories.firstIndex(where: { $0.id == updatedCategory.id }) {
+                categories[index].update(with: updatedCategory)
+            } else {
+                categories.append(updatedCategory)
+            }
+        }
+        
+        for updatedCurrency in updatedShop.currencies {
+            if let index = currencies.firstIndex(where: { $0.id == updatedCurrency.id }) {
+                currencies[index].update(with: updatedCurrency)
+            } else {
+                currencies.append(updatedCurrency)
+            }
+        }
+        
+        var newOffers = [YMLOffer]()
+        
+        for updatedOffer in updatedShop.offers {
+            if let index = offers.firstIndex(where: { $0.id == updatedOffer.id }) {
+                offers[index] = updatedOffer
+            } else {
+                newOffers.append(updatedOffer)
+            }
+        }
+        
+        offers.append(contentsOf: newOffers)
+    }
 }
 
 // MARK: - Dummy Shop
@@ -104,7 +144,7 @@ extension YMLShop {
                 description: "Dummy Description",
                 manufacturer_warranty: false,
                 model: "Dummy Model",
-                modified_time: Date(timeIntervalSince1970: 0),
+                modified_time: 0,
                 name: "Dummy Name",
                 oldprice: nil,
                 params: [],

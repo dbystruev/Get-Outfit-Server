@@ -41,6 +41,9 @@ class XMLManager: NSObject {
         }
     }
     
+    // MARK: - Static Properties
+    static let xmlParserQueue = DispatchQueue(label: "XMLManager.xmlParserQueue")
+    
     // MARK: - Stored Properties
     #if DEBUG
     var elements = [String: (begin: Int, end: Int, level: Int)]()
@@ -119,14 +122,18 @@ class XMLManager: NSObject {
             completion(nil, Errors.invalidLocalURL(localPath ?? "nil"))
             return
         }
-        guard let parser = XMLParser(contentsOf: localURL) else {
-            completion(nil, Errors.cantCreateXMLParser(localURL))
-            return
-        }
         
         self.completion = completion
-        parser.delegate = self
-        parser.parse()
+        
+        XMLManager.xmlParserQueue.async {
+            guard let parser = XMLParser(contentsOf: localURL) else {
+                completion(nil, Errors.cantCreateXMLParser(localURL))
+                return
+            }
+            
+            parser.delegate = self
+            parser.parse()
+        }
     }
     
     func updateFromRemote(completion: @escaping (Error?) -> Void) {

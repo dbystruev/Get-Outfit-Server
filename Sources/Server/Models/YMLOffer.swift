@@ -17,7 +17,7 @@ struct YMLOffer: Codable {
     var description: String?
     var manufacturer_warranty: Bool?
     var model: String?
-    var modified_time: Date?
+    var modified_time: TimeInterval? // since 1970.01.01
     var name: String?
     var oldprice: Decimal?
     var params = [YMLParam]()
@@ -73,7 +73,7 @@ extension YMLOffer: XMLElement {
         
         if let modified_time = modified_time {
             children.append(GenericXMLElement(
-                characters: "\(modified_time.timeIntervalSince1970)",
+                characters: "\(modified_time)",
                 elementName: "modified_time"
             ))
         }
@@ -86,23 +86,11 @@ extension YMLOffer: XMLElement {
             children.append(GenericXMLElement(characters: "\(oldprice)", elementName: "oldprice"))
         }
         
-        #if DEBUG
-        Log.debug("\(children.count), params = \(params.count)")
-        #endif
-        
         params.forEach { children.append($0) }
-        
-        #if DEBUG
-        Log.debug("\(children.count), pictures = \(pictures.count)")
-        #endif
         
         pictures.forEach { url in
             children.append(GenericXMLElement(characters: url.absoluteString, elementName: "picture"))
         }
-        
-        #if DEBUG
-        Log.debug("\(children.count)")
-        #endif
         
         if let price = price {
             children.append(GenericXMLElement(characters: "\(price)", elementName: "price"))
@@ -148,9 +136,7 @@ extension YMLOffer: XMLElement {
         case "model":
             model = child.characters
         case "modified_time":
-            if let time = TimeInterval(child.characters) {
-                modified_time = Date(timeIntervalSince1970: time)
-            }
+            modified_time = TimeInterval(child.characters)
         case "name":
             name = child.characters
         case "oldprice":

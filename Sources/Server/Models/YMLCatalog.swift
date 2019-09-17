@@ -38,11 +38,23 @@ extension YMLCatalog: XMLElement {
     }
     
     func addChild(_ child: XMLElement) {
-        if child.elementName == "shop", let shop = child as? YMLShop {
+        if let shop = child as? YMLShop {
             self.shop = shop
         }
     }
 
+    func update(with element: XMLElement) {
+        if let catalog = element as? Self {
+            date = catalog.date ?? date
+            if let updatedShop = catalog.shop {
+                if shop == nil {
+                    shop = updatedShop
+                } else {
+                    shop?.update(with: updatedShop)
+                }
+            }
+        }
+    }
 }
 
 extension YMLCatalog {

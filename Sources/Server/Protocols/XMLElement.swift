@@ -53,9 +53,5 @@ extension XMLElement {
         characters += string
     }
     
-    mutating func update(with element: XMLElement) {
-//        attributes.merge(element.attributes) { old, new in new }
-//        characters = element.characters
-        // TODO: TO BE CONTINUED
-    }
+    mutating func update(with element: XMLElement) {}
 }

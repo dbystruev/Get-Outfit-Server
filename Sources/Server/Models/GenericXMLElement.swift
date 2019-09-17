@@ -21,4 +21,8 @@ struct GenericXMLElement: XMLElement {
         self.children = children
         self.elementName = elementName
     }
+    
+    mutating func addChild(_ child: XMLElement) {
+        children.append(child)
+    }
 }
