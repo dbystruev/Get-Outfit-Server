@@ -23,6 +23,10 @@ env > "$LOGDIR/env.txt"
 echo WORKDIR: "$WORKDIR" >> "$LOG" 2>&1
 echo SCHEME: $SCHEME >> "$LOG" 2>&1
 
+# Replace port 8080 with 80
+cat Sources/Server/Main/main.swift | sed "s/onPort: 8080/onPort: 80/" > main.swift.new
+mv -f main.swift.new Sources/Server/Main/main.swift >> "$LOG" 2>&1
+
 # Stop running server 
 killall Server >> "$LOG" 2>&1
 

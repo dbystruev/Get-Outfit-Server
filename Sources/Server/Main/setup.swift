@@ -128,6 +128,8 @@ func setup(_ redis: Redis) {
 func setup(_ router: Router) {
     router.setDefault(templateEngine: StencilTemplateEngine())
     
+    var offers = catalog.shop?.offers
+    
     // MARK: - GET /
     router.get("/") { request, response, next in
         try response.render("home", context: [:])
@@ -135,7 +137,7 @@ func setup(_ router: Router) {
     }
     
     // MARK: - GET /categories
-    router.get("categories") { request, response, next in
+    router.get("/categories") { request, response, next in
         var categories = catalog.shop?.categories
         
         // MARK: "id"
@@ -164,7 +166,7 @@ func setup(_ router: Router) {
     }
     
     // MARK: - GET /currencies
-    router.get("currencies") { request, response, next in
+    router.get("/currencies") { request, response, next in
         let currencies = catalog.shop?.currencies
         
         // MARK: "count"
@@ -178,21 +180,20 @@ func setup(_ router: Router) {
     }
     
     // MARK: - GET /offers
-    router.get("offers") { request, response, next in
-        var offers = catalog.shop?.offers
-        
-        if request.queryParameters.isEmpty {
+    router.get("/offers") { request, response, next in
+        // Show only available offers by default
+        if request.queryParameters["available"] == nil && request.queryParameters["deleted"] == nil {
             offers = offers?.filter { $0.available == true }
-        }
-        
-        // MARK: "available"
-        if let available = request.queryParameters["available"] {
-            offers = offers?.filter { $0.available == Bool(available) }
-        }
-        
-        // MARK: "deleted"
-        if let deleted = request.queryParameters["deleted"] {
-            offers = offers?.filter { $0.deleted == Bool(deleted) }
+        } else {
+            // MARK: "available"
+            if let available = request.queryParameters["available"] {
+                offers = offers?.filter { $0.available == Bool(available) }
+            }
+            
+            // MARK: "deleted"
+            if let deleted = request.queryParameters["deleted"] {
+                offers = offers?.filter { $0.deleted == Bool(deleted) }
+            }
         }
         
         // MARK: "id"
@@ -358,22 +359,9 @@ func setup(_ router: Router) {
             offers = offers?.filter { $0.vendorCode?.lowercased() == vendorCode.lowercased() }
         }
         
-        // MARK: "count"
         if request.queryParameters["count"] == nil {
-            if
-                request.queryParameters["modified_times"] != nil,
-                let modifiedTimes = offers?.compactMap({ $0.modified_time }),
-                let minTime = modifiedTimes.min(),
-                let maxTime = modifiedTimes.max()
-            {
-                #if DEBUG
-                Log.debug("Min Time: \(minTime), Max Time: \(maxTime)")
-                #endif
-                
-                response.send(json: ["modified_time_min": minTime, "modified_time_max": maxTime])
-            } else {
-                response.send(json: offers)
-            }
+            response.send(json: offers)
+        // MARK: "count"
         } else {
             response.send(json: ["count": offers?.count])
         }
@@ -381,8 +369,42 @@ func setup(_ router: Router) {
         next()
     }
     
+    // MARK: - GET /offers/modified_times
+    router.get("/offers/modified_times") { request, response, next in
+        if
+            let modifiedTimes = offers?.compactMap({ $0.modified_time }),
+            let minTime = modifiedTimes.min(),
+            let maxTime = modifiedTimes.max()
+        {
+            #if DEBUG
+            Log.debug("Min Time: \(minTime), Max Time: \(maxTime)")
+            #endif
+            
+            response.send(json: ["modified_time_min": minTime, "modified_time_max": maxTime])
+        }
+        
+        next()
+    }
+
+    // MARK: "/offers/prices"
+    router.get("/offers/prices") { request, response, next in
+        if
+            let priceRange = offers?.compactMap({ $0.price }),
+            let minPrice = priceRange.min(),
+            let maxPrice = priceRange.max()
+        {
+            #if DEBUG
+            Log.debug("Min Price: \(minPrice), Max Price: \(maxPrice)")
+            #endif
+            
+            response.send(json: ["price_min": minPrice, "price_max": maxPrice])
+        }
+        
+        next()
+    }
+    
     // MARK: - GET /params
-    router.get("params") { request, response, next in
+    router.get("/params") { request, response, next in
         let isNotCounting = request.queryParameters["count"] == nil
         let offers = catalog.shop?.offers
         
@@ -407,7 +429,7 @@ func setup(_ router: Router) {
     }
     
     // MARK: - GET /stylist
-    router.get("stylist") { request, response, next in
+    router.get("/stylist") { request, response, next in
         guard let subid = request.queryParameters["subid"] else {
             try response.status(.badRequest).end()
             return
