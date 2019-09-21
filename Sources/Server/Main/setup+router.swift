@@ -70,13 +70,32 @@ func setup(_ router: Router) {
     
     // MARK: - GET /images
     router.get("/images") { request, response, next in
-        let images = Set(catalog.shop?.offers.flatMap { $0.pictures } ?? [])
+        let images = Set(catalog.shop?.offers.flatMap { $0.pictures } ?? []).sorted()
         
         // MARK: "count"
         if request.queryParameters["count"] == nil {
             response.send(json: images)
         } else {
             response.send(json: ["count": images.count])
+        }
+        
+        next()
+    }
+    
+    // MARK: - GET /modified_times
+    router.get("/modified_times") { request, response, next in
+        let offers = catalog.shop?.offers
+        
+        if
+            let modifiedTimes = offers?.compactMap({ $0.modified_time }),
+            let minTime = modifiedTimes.min(),
+            let maxTime = modifiedTimes.max()
+        {
+            #if DEBUG
+            Log.debug("Min Time: \(minTime), Max Time: \(maxTime)")
+            #endif
+            
+            response.send(json: ["modified_time_min": minTime, "modified_time_max": maxTime])
         }
         
         next()
@@ -188,7 +207,7 @@ func setup(_ router: Router) {
         
         // MARK: "{params}"
         if let paramNames = offers?.flatMap({ $0.params.compactMap({ param in param.name?.lowercased() }) }) {
-            for name in Set(paramNames) {
+            for name in Set(paramNames).sorted() {
                 if let encodedName = name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
                     if let value = request.queryParameters[encodedName]?.lowercased() {
                         offers = offers?.filter { offer in
@@ -274,27 +293,45 @@ func setup(_ router: Router) {
         next()
     }
     
-    // MARK: - GET /offers/modified_times
-    router.get("/offers/modified_times") { request, response, next in
+    // MARK: - GET /params
+    router.get("/params") { request, response, next in
+        let isNotCounting = request.queryParameters["count"] == nil
         let offers = catalog.shop?.offers
         
-        if
-            let modifiedTimes = offers?.compactMap({ $0.modified_time }),
-            let minTime = modifiedTimes.min(),
-            let maxTime = modifiedTimes.max()
-        {
-            #if DEBUG
-            Log.debug("Min Time: \(minTime), Max Time: \(maxTime)")
-            #endif
+        if let paramNames = offers?.flatMap({ $0.params.compactMap({ param in param.name?.lowercased() }) }) {
+            let names = Set(paramNames).sorted()
+            var result = [String: [String]]()
             
-            response.send(json: ["modified_time_min": minTime, "modified_time_max": maxTime])
+            for name in names {
+                if
+                    let paramValues = offers?.flatMap({ $0.params
+                        .filter({ param in param.name?.lowercased() == name})
+                        .compactMap({ param in param.value })
+                    })
+                {
+                    result[name] = Set(paramValues).sorted()
+                }
+            }
+            
+            // MARK: "count"
+            if isNotCounting {
+                response.send(json: result)
+            } else {
+                response.send(json: ["count": result.count])
+            }
+        } else {
+            if isNotCounting {
+                response.send(json: [String: [String]]())
+            } else {
+                response.send(json: ["count": 0])
+            }
         }
         
         next()
     }
     
-    // MARK: "/offers/prices"
-    router.get("/offers/prices") { request, response, next in
+    // MARK: "/prices"
+    router.get("/prices") { request, response, next in
         let offers = catalog.shop?.offers
         
         if
@@ -307,31 +344,6 @@ func setup(_ router: Router) {
             #endif
             
             response.send(json: ["price_min": minPrice, "price_max": maxPrice])
-        }
-        
-        next()
-    }
-    
-    // MARK: - GET /params
-    router.get("/params") { request, response, next in
-        let isNotCounting = request.queryParameters["count"] == nil
-        let offers = catalog.shop?.offers
-        
-        if let paramNames = offers?.flatMap({ $0.params.compactMap({ param in param.name?.lowercased() }) }) {
-            let names = Set(paramNames)
-            
-            // MARK: "count"
-            if isNotCounting {
-                response.send(json: names)
-            } else {
-                response.send(json: ["count": names.count])
-            }
-        } else {
-            if isNotCounting {
-                response.send(json: Set<String>())
-            } else {
-                response.send(json: ["count": 0])
-            }
         }
         
         next()
