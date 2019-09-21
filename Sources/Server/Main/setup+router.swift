@@ -1,128 +1,13 @@
 //
-//  setup.swift
+//  setup+router.swift
 //
-//  Created by Denis Bystruev on 15/09/2019.
+//  Created by Denis Bystruev on 21/09/2019.
 //
 
 import Foundation
 import Kitura
 import KituraStencil
 import LoggerAPI
-import SwiftRedis
-
-// MARK: - Setup Catalog
-func setup(completion: @escaping (YMLCatalog?, Error?) -> Void) {
-    
-    let xmlManager = XMLManager()
-    
-    func loadCatalog(completion: @escaping (YMLCatalog?, Error?) -> Void) {
-        let decoder = PropertyListDecoder()
-        
-        // MARK: Try to load from UserDefaults
-        if
-            let savedData = UserDefaults.standard.data(forKey: "\(YMLCatalog.self)"),
-            let catalog = try? decoder.decode(YMLCatalog.self, from: savedData)
-        {
-            #if DEBUG
-            Log.debug(
-                "Found local YMLCatalog \(catalog.date?.toString ?? "nil")" +
-                ", offers: \(catalog.shop?.offers.count ?? 0)"
-            )
-            #endif
-            
-            completion(catalog, nil)
-            return
-        }
-        
-        // MARK: Try to load into XML file/parse it
-        xmlManager.loadAndParse(using: "XML/full.xml") { catalog, error in
-            if let error = error {
-                completion(nil, error)
-                return
-            }
-            
-            guard let catalog = catalog else {
-                completion(nil, XMLManager.Errors.emptyCatalog)
-                return
-            }
-            
-            #if DEBUG
-            Log.debug(
-                "Parsed XML YMLCatalog \(catalog.date?.toString ?? "nil")" +
-                ", offers: \(catalog.shop?.offers.count ?? 0)"
-            )
-            #endif
-            
-            let encoder = PropertyListEncoder()
-            guard let encodedCatalog = try? encoder.encode(catalog) else {
-                Log.error("Can't encode \(catalog)")
-                completion(catalog, nil)
-                return
-            }
-            
-            UserDefaults.standard.set(encodedCatalog, forKey: "\(YMLCatalog.self)")
-            completion(catalog, nil)
-        }
-    }
-    
-    func updateCatalog(completion: @escaping (YMLCatalog?, Error?) -> Void) {
-        xmlManager.loadAndParse(using: "XML/update.xml", completion: completion)
-    }
-    
-    loadCatalog { loadedCatalog, error in
-        guard let catalog = loadedCatalog, error == nil else {
-            completion(loadedCatalog, error)
-            return
-        }
-        
-        #if DEBUG
-        Log.debug(
-            "Loaded YMLCatalog \(catalog.date?.toString ?? "nil")" +
-            ", offers: \(catalog.shop?.offers.count ?? 0)"
-        )
-        #endif
-        
-        let yesterday = Date().addingTimeInterval(-86400)
-        
-        if let catalogDate = catalog.date, catalogDate < yesterday {
-            xmlManager.lastImport = catalogDate
-            updateCatalog { updatedCatalog, error in
-                if let error = error {
-                    Log.error(error.localizedDescription)
-                }
-                if let updatedCatalog = updatedCatalog {
-                    catalog.update(with: updatedCatalog)
-                }
-                #if DEBUG
-                Log.debug(
-                    "Updated YMLCatalog \(catalog.date?.toString ?? "nil")" +
-                    ", offers: \(catalog.shop?.offers.count ?? 0)"
-                )
-                #endif
-                completion(catalog, nil)
-            }
-        } else {
-            completion(catalog, nil)
-        }
-    }
-}
-
-// MARK: - Setup Redis
-func setup(_ redis: Redis) {
-    let host = "localhost"
-    let port = Int32(6379)
-    
-    redis.connect(host: host, port: port) { error in
-        if let error = error {
-            Log.error("\(error.localizedDescription) at \(host):\(port)")
-            return
-        }
-        
-        #if DEBUG
-        Log.debug("Connected to Redis at \(host):\(port)")
-        #endif
-    }
-}
 
 // MARK: - Setup Router
 func setup(_ router: Router) {
@@ -174,6 +59,26 @@ func setup(_ router: Router) {
             response.send(json: currencies)
         } else {
             response.send(json: ["count": currencies?.count])
+        }
+        
+        next()
+    }
+    
+    // MARK: - GET /date
+    router.get("/date") { request, response, next in
+        response.send(json: ["date": catalog.date?.toString])
+        next()
+    }
+    
+    // MARK: - GET /images
+    router.get("/images") { request, response, next in
+        let images = Set(catalog.shop?.offers.flatMap { $0.pictures } ?? [])
+        
+        // MARK: "count"
+        if request.queryParameters["count"] == nil {
+            response.send(json: images)
+        } else {
+            response.send(json: ["count": images.count])
         }
         
         next()
@@ -361,7 +266,7 @@ func setup(_ router: Router) {
         
         if request.queryParameters["count"] == nil {
             response.send(json: offers)
-        // MARK: "count"
+            // MARK: "count"
         } else {
             response.send(json: ["count": offers?.count])
         }
@@ -385,7 +290,7 @@ func setup(_ router: Router) {
         
         next()
     }
-
+    
     // MARK: "/offers/prices"
     router.get("/offers/prices") { request, response, next in
         if
@@ -440,5 +345,31 @@ func setup(_ router: Router) {
         try response.render("stylist", context: ["subid": subid])
         
         next()
+    }
+    
+    // MARK: - GET /update
+    router.get("/update") { request, response, next in
+        let yesterday = Date().addingTimeInterval(-86400)
+        
+        guard let updatedCatalogDate = catalog.date, updatedCatalogDate < yesterday else {
+            response.send(json: ["date": catalog.date?.toString])
+            next()
+            return
+        }
+        
+        xmlManager.lastImport = updatedCatalogDate
+        updateCatalogFromRemote { remoteCatalog, error in
+            if let error = error { Log.error(error.localizedDescription) }
+            if let remoteCatalog = remoteCatalog { catalog.update(with: remoteCatalog) }
+            #if DEBUG
+            Log.debug(
+                "Updated catalog from remote \(catalog)"
+            )
+            #endif
+            
+            save(catalog)
+            response.send(json: ["date": catalog.date?.toString])
+            next()
+        }
     }
 }

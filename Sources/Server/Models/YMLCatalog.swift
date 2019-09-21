@@ -68,16 +68,7 @@ extension YMLCatalog {
 // MARK: - CustomStringConvertible
 extension YMLCatalog: CustomStringConvertible {
     var description: String {
-        var properties = ""
-        if let date = date { properties += "date: \"\(date.toString)\", " }
-        if let shop = shop { properties += "shop: \"\(shop)\", " }
-        
-        let catalog = "\(YMLCatalog.self)"
-        if properties.isEmpty {
-            return catalog
-        } else {
-            return "\(catalog)(\(properties.dropLast(2)))"
-        }
+        return "\(date?.toString ?? "nil"), offers: \(shop?.offers.count ?? 0)"
     }
 }
 #endif

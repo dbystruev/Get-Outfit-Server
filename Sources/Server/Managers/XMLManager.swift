@@ -14,6 +14,7 @@ class XMLManager: NSObject {
         case emptyCatalog
         case invalidLocalURL(String)
         case invalidRemoteURL(String)
+        case noLocalData(String)
         case noRemoteData(URL)
         case noRootElement
         case notMatchedElements([XMLElement])
@@ -29,6 +30,8 @@ class XMLManager: NSObject {
                 return "Invalid local URL \(path)"
             case .invalidRemoteURL(let path):
                 return "Invalid remote URL \(path)"
+            case .noLocalData(let path):
+                return "No local data at \(path)"
             case .noRemoteData(let url):
                 return "No remote data at \(url)"
             case .noRootElement:
@@ -98,22 +101,27 @@ class XMLManager: NSObject {
     }
     
     // MARK: - Methods
-    func loadAndParse(using localPath: String, completion: @escaping (YMLCatalog?, Error?) -> Void) {
+    func loadAndParseLocally(using localPath: String, completion: @escaping (YMLCatalog?, Error?) -> Void) {
         self.localPath = localPath
-        if isLoaded {
-            #if DEBUG
-            Log.debug("Found local \(localPath)")
-            #endif
-            
-            parseLoaded(completion: completion)
-        } else {
-            updateFromRemote { error in
-                guard error == nil else {
-                    completion(nil, error)
-                    return
-                }
-                self.parseLoaded(completion: completion)
+        guard isLoaded else {
+            completion(nil, Errors.noLocalData(localURL?.path ?? "nil"))
+            return
+        }
+        #if DEBUG
+        Log.debug("Found local \(localPath)")
+        #endif
+        
+        parseLoaded(completion: completion)
+    }
+    
+    func loadAndParseFromRemote(using localPath: String, completion: @escaping (YMLCatalog?, Error?) -> Void) {
+        self.localPath = localPath
+        updateFromRemote { error in
+            guard error == nil else {
+                completion(nil, error)
+                return
             }
+            self.parseLoaded(completion: completion)
         }
     }
     
@@ -148,7 +156,7 @@ class XMLManager: NSObject {
         }
         
         #if DEBUG
-        Log.debug(url.absoluteString)
+        Log.debug("Requesting update from \(url.absoluteString)")
         #endif
         
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
@@ -161,6 +169,10 @@ class XMLManager: NSObject {
                 completion(Errors.noRemoteData(url))
                 return
             }
+            
+            #if DEBUG
+            Log.debug("Saving update to \(localURL.path)")
+            #endif
             
             do {
                 try data.write(to: localURL, options: .atomicWrite)

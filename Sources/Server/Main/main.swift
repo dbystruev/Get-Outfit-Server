@@ -19,6 +19,7 @@ HeliumLogger.use(.info)
 let catalog = YMLCatalog()
 let redis = Redis()
 let router = Router()
+let xmlManager = XMLManager()
 
 setup { loadedCatalog, error in
     if let error = error {
