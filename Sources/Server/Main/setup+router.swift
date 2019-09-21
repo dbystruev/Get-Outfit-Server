@@ -13,8 +13,6 @@ import LoggerAPI
 func setup(_ router: Router) {
     router.setDefault(templateEngine: StencilTemplateEngine())
     
-    var offers = catalog.shop?.offers
-    
     // MARK: - GET /
     router.get("/") { request, response, next in
         try response.render("home", context: [:])
@@ -86,6 +84,8 @@ func setup(_ router: Router) {
     
     // MARK: - GET /offers
     router.get("/offers") { request, response, next in
+        var offers = catalog.shop?.offers
+        
         // Show only available offers by default
         if request.queryParameters["available"] == nil && request.queryParameters["deleted"] == nil {
             offers = offers?.filter { $0.available == true }
@@ -276,6 +276,8 @@ func setup(_ router: Router) {
     
     // MARK: - GET /offers/modified_times
     router.get("/offers/modified_times") { request, response, next in
+        let offers = catalog.shop?.offers
+        
         if
             let modifiedTimes = offers?.compactMap({ $0.modified_time }),
             let minTime = modifiedTimes.min(),
@@ -293,6 +295,8 @@ func setup(_ router: Router) {
     
     // MARK: "/offers/prices"
     router.get("/offers/prices") { request, response, next in
+        let offers = catalog.shop?.offers
+        
         if
             let priceRange = offers?.compactMap({ $0.price }),
             let minPrice = priceRange.min(),
