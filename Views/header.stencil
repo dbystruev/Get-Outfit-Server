@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html>
+<head>
+<meta charset="utf-8" />
 <title>Links for Stylist with SubID: {{ stylist }}</title>
+</head>
 <body>
 <h1>Links for Stylist with SubID: {{ stylist }}</h1>
