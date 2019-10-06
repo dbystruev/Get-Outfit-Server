@@ -128,34 +128,14 @@ extension YMLShop: XMLElement {
 
 // MARK: - Dummy Shop
 extension YMLShop {
-    static var dummyShop: YMLShop {
+    static var emptyShop: YMLShop {
         return YMLShop(
-            title: "Dummy Shop",
-            company: "Dummy Company",
-            url: URL(string: "http://dummyurl.com"),
-            categories: [YMLCategory(id: 1, name: "Dummy Category", parentId: nil)],
-            currencies: [YMLCurrency(id: "Dummy Currency", rate: "1")],
-            offers: [YMLOffer(
-                available: true,
-                deleted: false,
-                id: "Dummy ID",
-                categoryId: 1,
-                currencyId: "Dummy Currency",
-                description: "Dummy Description",
-                manufacturer_warranty: false,
-                model: "Dummy Model",
-                modified_time: 0,
-                name: "Dummy Name",
-                oldprice: nil,
-                params: [],
-                pictures: [],
-                price: 100,
-                sales_notes: "Dummy Notes",
-                typePrefix: "Dummy Type",
-                url: URL(string: "http://dummyurl.com"),
-                vendor: "Dummy Vendor",
-                vendorCode: "Dummy Vendor Code")
-            ]
+            title: "Empty Shop",
+            company: "Empty Company",
+            url: URL(string: "http://getoutfit.ru"),
+            categories: [],
+            currencies: [],
+            offers: []
         )
     }
 }

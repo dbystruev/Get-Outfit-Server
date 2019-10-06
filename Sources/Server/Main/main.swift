@@ -30,14 +30,14 @@ setup { loadedCatalog, error in
         catalog.date = loadedCatalog.date
         catalog.shop = loadedCatalog.shop
     } else {
-        Log.error("Loading dummy sample")
+        Log.error("Loading empty shop")
         catalog.date = Date(timeIntervalSince1970: 0)
-        catalog.shop = YMLShop.dummyShop
+        catalog.shop = YMLShop.emptyShop
     }
     
     setup(redis)
     setup(router)
 }
 
-Kitura.addHTTPServer(onPort: 80, with: router)
+Kitura.addHTTPServer(onPort: 8080, with: router)
 Kitura.run()

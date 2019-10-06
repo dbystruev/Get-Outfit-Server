@@ -103,6 +103,8 @@ func setup(_ router: Router) {
     
     // MARK: - GET /offers
     router.get("/offers") { request, response, next in
+        let requestStartTime = Date()
+        
         var offers = catalog.shop?.offers
         
         // Show only available offers by default
@@ -128,6 +130,27 @@ func setup(_ router: Router) {
         // MARK: "categoryId"
         if let categoryId = request.queryParameters["categoryId"] {
             offers = offers?.filter { $0.categoryId == Int(categoryId) }
+        }
+        
+        // MARK: "corner"
+        if let corner = request.queryParameters["corner"]?.lowercased() {
+            let categories: [Int?]
+            
+            switch corner {
+            case "bottomleft":
+                categories = []
+            case "bottomright":
+                categories = []
+            case "middleright":
+                categories = []
+            case "topleft":
+                categories = []
+            case "topright":
+                categories = []
+            default:
+                categories = catalog.shop?.categories.compactMap({ $0.id }) ?? []
+            }
+            offers = offers?.filter { categories.contains($0.categoryId) }
         }
         
         // MARK: "currencyId"
@@ -283,11 +306,18 @@ func setup(_ router: Router) {
             offers = offers?.filter { $0.vendorCode?.lowercased() == vendorCode.lowercased() }
         }
         
-        if request.queryParameters["count"] == nil {
-            response.send(json: offers)
+        let isCounting = request.queryParameters["count"] != nil
+        let isTiming = request.queryParameters["duration"] != nil
+        
+        if isTiming {
+            // MARK: "duration"
+            let duration = Date().timeIntervalSince(requestStartTime)
+            response.send(json: ["duration": duration])
+        } else if isCounting {
             // MARK: "count"
-        } else {
             response.send(json: ["count": offers?.count])
+        } else {
+            response.send(json: offers)
         }
         
         next()
@@ -295,7 +325,7 @@ func setup(_ router: Router) {
     
     // MARK: - GET /params
     router.get("/params") { request, response, next in
-        let isNotCounting = request.queryParameters["count"] == nil
+        let isCounting = request.queryParameters["count"] != nil
         let offers = catalog.shop?.offers
         
         if let paramNames = offers?.flatMap({ $0.params.compactMap({ param in param.name?.lowercased() }) }) {
@@ -314,16 +344,16 @@ func setup(_ router: Router) {
             }
             
             // MARK: "count"
-            if isNotCounting {
-                response.send(json: result)
-            } else {
+            if isCounting {
                 response.send(json: ["count": result.count])
+            } else {
+                response.send(json: result)
             }
         } else {
-            if isNotCounting {
-                response.send(json: [String: [String]]())
-            } else {
+            if isCounting {
                 response.send(json: ["count": 0])
+            } else {
+                response.send(json: [String: [String]]())
             }
         }
         

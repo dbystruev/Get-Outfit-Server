@@ -36,6 +36,7 @@ open Server.xcodeproj
   - [?available=true](http://server.getoutfit.ru/offers?available=true) (set by default)
   - [?count=true](http://server.getoutfit.ru/offers?count=true)
   - [?deleted=true](http://server.getoutfit.ru/offers?deleted=true)
+  - [?duration=true](http://server.getoutfit.ru/offers?duration=true)
   - [?id=text](http://server.getoutfit.ru/offers?id=text)
   - [?categoryId=1](http://server.getoutfit.ru/offers?categoryId=1)
   - [?currencyId=RUB](http://server.getoutfit.ru/offers?currencyId=RUB)
