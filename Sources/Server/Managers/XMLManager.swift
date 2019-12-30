@@ -4,7 +4,7 @@
 //  Created by Denis Bystruev on 13/09/2019.
 //
 
-import Foundation
+import Foundation; import FoundationXML; import FoundationNetworking
 import LoggerAPI
 
 class XMLManager: NSObject {
@@ -175,7 +175,7 @@ class XMLManager: NSObject {
             #endif
             
             do {
-                try data.write(to: localURL, options: .atomicWrite)
+                try data.write(to: localURL, options: .atomic)
                 completion(nil)
             } catch let writeError {
                 completion(writeError)

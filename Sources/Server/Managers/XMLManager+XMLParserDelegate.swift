@@ -4,7 +4,7 @@
 //  Created by Denis Bystruev on 13/09/2019.
 //
 
-import Foundation
+import Foundation; import FoundationXML
 import HTMLEntities
 import LoggerAPI
 
