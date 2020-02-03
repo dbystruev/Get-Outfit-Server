@@ -1,24 +1,27 @@
 # Get Outfit Server
 
-## Run for release
-```
-swift package clean
-swift build -c release
-swift run -c release
-```
+Server for [Get Outfit](https://getoutfit.ru)
 
-## Run to debug
-```
-switch package clean
-swift build
-swift run
-```
-
-## Use Xcode
-```
-swift package generate-xcodeproj
-open Server.xcodeproj
-```
+* Run Get Outfit Server in Docker from Swift image
+  ```bash
+  docker run -p80:8080 -it --name GetOutfit -w/GetOutfit swift bash
+  git clone https://github.com/dbystruev/Get-Outfit-Server.git .
+  apt update && apt -y upgrade
+  apt -y install openssl libssl-dev libmysqlclient-dev libcurl4-openssl-dev
+  swift build -c release
+  exit
+  ```
+  
+* Create getoutfit image
+  ```bash
+  docker commit GetOutfit getoutfit
+  docker rm GetOutfit
+  ```
+  
+* Run new Get Outfit Server in Docker from getoutfit image
+  ```bash
+  docker run --name GetOutfit -p80:8080 -d -w/GetOutfit getoutfit swift run -c release
+  ```
 
 ## JSON Routes
 - [/categories](http://server.getoutfit.ru/categories)
