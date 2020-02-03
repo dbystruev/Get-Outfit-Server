@@ -4,7 +4,7 @@ Server for [Get Outfit](https://getoutfit.ru)
 
 * Run Get Outfit Server in Docker from Swift image
   ```bash
-  docker run -p8080:8080 -it --name GetOutfit -w/GetOutfit swift bash
+  docker run -p80:80 -it --name GetOutfit -w/GetOutfit swift bash
   git clone https://github.com/dbystruev/Get-Outfit-Server.git .
   apt update && apt -y upgrade
   apt -y install openssl libssl-dev libmysqlclient-dev libcurl4-openssl-dev
@@ -20,7 +20,7 @@ Server for [Get Outfit](https://getoutfit.ru)
   
 * Run new Get Outfit Server in Docker from getoutfit image
   ```bash
-  docker run --name GetOutfit -p8080:8080 -d -w/GetOutfit getoutfit swift run -c release
+  docker run --name GetOutfit -p80:80 -d -w/GetOutfit getoutfit swift run -c release
   ```
 
 ## JSON Routes
