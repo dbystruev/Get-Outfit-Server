@@ -4,7 +4,16 @@
 //  Created by Denis Bystruev on 13/09/2019.
 //
 
-import Foundation; import FoundationXML; import FoundationNetworking
+// FoundationXML and FoundationNetworking is for Linux only
+#if canImport(FoundationXML)
+import FoundationXML
+#endif
+
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
+
+import Foundation
 import LoggerAPI
 
 class XMLManager: NSObject {

@@ -5,6 +5,7 @@ Server for [Get Outfit](https://getoutfit.ru)
 * Run Get Outfit Server in Docker from Swift image
   ```bash
   docker run -p80:80 -it --name GetOutfit -w/GetOutfit swift bash
+  # if needed: mkdir -p $HOME/Documents/XML
   git clone https://github.com/dbystruev/Get-Outfit-Server.git .
   apt update && apt -y upgrade
   apt -y install openssl libssl-dev libmysqlclient-dev libcurl4-openssl-dev

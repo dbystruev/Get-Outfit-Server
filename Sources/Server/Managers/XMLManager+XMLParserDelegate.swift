@@ -4,7 +4,12 @@
 //  Created by Denis Bystruev on 13/09/2019.
 //
 
-import Foundation; import FoundationXML
+// FoundationXML is for Linux only
+#if canImport(FoundationXML)
+import FoundationXML
+#endif
+
+import Foundation
 import HTMLEntities
 import LoggerAPI
 
@@ -44,9 +49,9 @@ extension XMLManager: XMLParserDelegate {
     
     func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         
-//        #if DEBUG
-//        Log.debug("\(elementName), \(processedElements)")
-//        #endif
+        //        #if DEBUG
+        //        Log.debug("\(elementName), \(processedElements)")
+        //        #endif
         
         if processedElements.isEmpty {
             Log.error("Ending \(elementName) has no starting element")
@@ -91,23 +96,23 @@ extension XMLManager: XMLParserDelegate {
             return
         }
         
-//        #if DEBUG
-//        Log.debug("Parsed \(elements.count) unique elements:")
-//        
-//        for (key, value) in elements.sorted(by: { leftElement, rightElement in
-//            let leftLevel = leftElement.value.level
-//            let rightLevel = rightElement.value.level
-//            if leftLevel == rightLevel {
-//                return leftElement.key < rightElement.key
-//            } else {
-//                return leftLevel < rightLevel
-//            }
-//        }) {
-//            let tabs = String(repeating: "\t", count: value.level)
-//            let counter = value.begin == value.end ? "\(value.begin)" : "\(value)"
-//            Log.debug("\(tabs)\(key): \(counter)", functionName: "", fileName: "")
-//        }
-//        #endif
+        //        #if DEBUG
+        //        Log.debug("Parsed \(elements.count) unique elements:")
+        //
+        //        for (key, value) in elements.sorted(by: { leftElement, rightElement in
+        //            let leftLevel = leftElement.value.level
+        //            let rightLevel = rightElement.value.level
+        //            if leftLevel == rightLevel {
+        //                return leftElement.key < rightElement.key
+        //            } else {
+        //                return leftLevel < rightLevel
+        //            }
+        //        }) {
+        //            let tabs = String(repeating: "\t", count: value.level)
+        //            let counter = value.begin == value.end ? "\(value.begin)" : "\(value)"
+        //            Log.debug("\(tabs)\(key): \(counter)", functionName: "", fileName: "")
+        //        }
+        //        #endif
         
         completion?(catalog, nil)
     }
