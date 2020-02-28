@@ -72,13 +72,15 @@ class XMLManager: NSObject {
     
     var remotePath = "http://export.admitad.com/ru/webmaster/websites/838792/products/export_adv_products/"
     
+    // Get remote parameters from Admitad
     var remoteParameters = [
         "currency": "RUB",
-        "code": "0khxm6hgw5",
-        "feed_id": "15540",
+        "code": "GET_FROM_Admitad",
+        "feed_id": "GET_FROM_Admitad",
         "last_import": "2000.01.01.00.00",
-        "template": "45655",
-        "user": "Kimsanzhiev",
+        "template": "GET_FROM_Admitad",
+        "user": "GET_FROM_Admitad",
+        "format": "xml",
     ]
     
     var localPath: String?
