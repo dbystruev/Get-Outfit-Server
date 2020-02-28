@@ -66,6 +66,7 @@ class XMLManager: NSObject {
     #endif
     
     var completion: ((YMLCatalog?, Error?) -> Void)?
+    var parserDidEndDocumentCalled = false
     var processedElements = [XMLElement]()
     var rootElement: XMLElement?
     
@@ -165,6 +166,11 @@ class XMLManager: NSObject {
             #if DEBUG
             Log.debug("Parse success")
             #endif
+
+            // BUG in Linux: parserDidEndDocument(_:) is not called automatically
+            if !self.parserDidEndDocumentCalled {
+                self.parserDidEndDocument(parser)
+            }
             // completion(catalog, nil)
         }
     }

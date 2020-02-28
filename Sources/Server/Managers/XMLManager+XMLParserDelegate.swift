@@ -87,6 +87,8 @@ extension XMLManager: XMLParserDelegate {
     }
     
     func parserDidEndDocument(_ parser: XMLParser) {
+        parserDidEndDocumentCalled = true
+        
         #if DEBUG
         Log.debug("FINISH")
         #endif
