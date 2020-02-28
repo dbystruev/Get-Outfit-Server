@@ -20,6 +20,7 @@ class XMLManager: NSObject {
     // MARK: - Errors
     enum Errors: Swift.Error {
         case cantCreateXMLParser(URL)
+        case cantParse
         case emptyCatalog
         case invalidLocalURL(String)
         case invalidRemoteURL(String)
@@ -33,6 +34,8 @@ class XMLManager: NSObject {
             switch self {
             case .cantCreateXMLParser(let url):
                 return "Can't create XML parser for \(url)"
+            case .cantParse:
+                return "Unknown parsing error: can't parse"
             case .emptyCatalog:
                 return "Catalogue is empty"
             case .invalidLocalURL(let path):
@@ -149,7 +152,20 @@ class XMLManager: NSObject {
             }
             
             parser.delegate = self
-            parser.parse()
+
+            guard parser.parse() else {
+                if let error = parser.parserError {
+                    completion(nil, error)
+                } else {
+                    completion(nil, XMLManager.Errors.cantParse)
+                }
+                return
+            }
+
+            #if DEBUG
+            Log.debug("Parse success")
+            #endif
+            // completion(catalog, nil)
         }
     }
     

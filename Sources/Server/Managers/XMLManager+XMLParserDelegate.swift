@@ -15,6 +15,10 @@ import LoggerAPI
 
 extension XMLManager: XMLParserDelegate {
     func parserDidStartDocument(_ parser: XMLParser) {
+        #if DEBUG
+        Log.debug("START")
+        #endif
+
         processedElements = []
         
         #if DEBUG
@@ -49,9 +53,11 @@ extension XMLManager: XMLParserDelegate {
     
     func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         
-        //        #if DEBUG
-        //        Log.debug("\(elementName), \(processedElements)")
-        //        #endif
+        #if DEBUG
+        if elementName == "yml_catalog" {
+            Log.debug("\(elementName), \(processedElements)")
+        }
+        #endif
         
         if processedElements.isEmpty {
             Log.error("Ending \(elementName) has no starting element")
@@ -81,6 +87,10 @@ extension XMLManager: XMLParserDelegate {
     }
     
     func parserDidEndDocument(_ parser: XMLParser) {
+        #if DEBUG
+        Log.debug("FINISH")
+        #endif
+
         guard processedElements.isEmpty else {
             completion?(nil, Errors.notMatchedElements(processedElements))
             return
@@ -114,6 +124,10 @@ extension XMLManager: XMLParserDelegate {
         //        }
         //        #endif
         
+        #if DEBUG
+        Log.debug("catalog = \(catalog)")
+        #endif
+
         completion?(catalog, nil)
     }
 }

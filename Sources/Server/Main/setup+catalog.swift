@@ -29,7 +29,7 @@ func loadCatalog(completion: @escaping (YMLCatalog?, Error?) -> Void) {
     }
     
     // MARK: Try to load into XML file/parse it
-    xmlManager.loadAndParseLocally(using: "XML/full.xml") { catalog, error in
+    xmlManager.loadAndParseLocally(using: "XML/update.xml") { catalog, error in
         if let error = error {
             completion(nil, error)
             return

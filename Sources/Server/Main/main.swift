@@ -39,5 +39,5 @@ setup { loadedCatalog, error in
     setup(router)
 }
 
-Kitura.addHTTPServer(onPort: 80, with: router)
+Kitura.addHTTPServer(onPort: 8888, with: router)
 Kitura.run()
