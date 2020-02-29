@@ -5,11 +5,11 @@ Server for [Get Outfit](https://getoutfit.ru)
 * Run Get Outfit Server in Docker from Swift image
   ```bash
   docker run -p80:8888 -it --name GetOutfit -w/GetOutfit swift bash
-  # if needed: mkdir -p $HOME/Documents/XML
+  mkdir -p $HOME/Documents/XML
   git clone https://github.com/dbystruev/Get-Outfit-Server.git .
   apt update && apt -y upgrade
-  apt -y install openssl libssl-dev libmysqlclient-dev libcurl4-openssl-dev
-  # add Sources/Server/Models/Shop+Data.swift with your Admitad data (see below)
+  apt -y install openssl libssl-dev libmysqlclient-dev libcurl4-openssl-dev vim
+  vi Sources/Server/Models/Shop+Data.swift # fill with your Admitad data (see below)
   swift build -c release
   exit
   ```
