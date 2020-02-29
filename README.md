@@ -9,6 +9,7 @@ Server for [Get Outfit](https://getoutfit.ru)
   git clone https://github.com/dbystruev/Get-Outfit-Server.git .
   apt update && apt -y upgrade
   apt -y install openssl libssl-dev libmysqlclient-dev libcurl4-openssl-dev
+  # add Sources/Server/Models/Shop+Data.swift with your Admitad data (see below)
   swift build -c release
   exit
   ```
@@ -23,6 +24,37 @@ Server for [Get Outfit](https://getoutfit.ru)
   ```bash
   docker run --name GetOutfit -p80:80 -d -w/GetOutfit getoutfit swift run -c release
   ```
+
+## Format of Sources/Server/Models/Shop+Data.swift
+```swift
+extension Shop {
+    static var all: [Shop] {
+        return [
+            Shop(
+                code: "Get from Admitad",
+                currency: "RUB",
+                feed_id: "Get from Admitad",
+                last_import: "2000.01.01.00.00",
+                name: "First Shop Name",
+                remotePath: "http://export.admitad.com/ru/webmaster/websites/838792/products/export_adv_products/",
+                template: "Get from Admitad",
+                user: "Get from Admitad"
+            ),
+            Shop(
+                code: "Get from Admitad",
+                currency: "RUB",
+                feed_id: "Get from Admitad",
+                last_import: "2000.01.01.00.00",
+                name: "Second Shop Name",
+                remotePath: "http://export.admitad.com/ru/webmaster/websites/838792/products/export_adv_products/",
+                template: "Get from Admitad",
+                user: "Get from Admitad"
+            ),
+            // ...
+        ]
+    }
+}
+```
 
 ## JSON Routes
 - [/categories](http://server.getoutfit.ru/categories)

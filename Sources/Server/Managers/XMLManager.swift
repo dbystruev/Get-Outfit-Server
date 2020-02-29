@@ -69,18 +69,20 @@ class XMLManager: NSObject {
     var parserDidEndDocumentCalled = false
     var processedElements = [XMLElement]()
     var rootElement: XMLElement?
+
+    let shop = Shop.all[0]
     
-    var remotePath = "http://export.admitad.com/ru/webmaster/websites/838792/products/export_adv_products/"
+    lazy var remotePath = shop.remotePath
     
     // Get remote parameters from Admitad
-    var remoteParameters = [
-        "currency": "RUB",
-        "code": "GET_FROM_Admitad",
-        "feed_id": "GET_FROM_Admitad",
-        "last_import": "2000.01.01.00.00",
-        "template": "GET_FROM_Admitad",
-        "user": "GET_FROM_Admitad",
-        "format": "xml",
+    lazy var remoteParameters = [
+        "currency": shop.currency,
+        "code": shop.code,
+        "feed_id": shop.feed_id,
+        "last_import": shop.last_import,
+        "template": shop.template,
+        "user": shop.user,
+        "format": shop.format,
     ]
     
     var localPath: String?

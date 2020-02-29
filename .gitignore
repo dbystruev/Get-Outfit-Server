@@ -4,3 +4,4 @@
 /Packages
 /*.xcodeproj
 /Package.resolved
+/Sources/Server/Models/Shop+Data.swift
