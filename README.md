@@ -22,7 +22,7 @@ Server for [Get Outfit](https://getoutfit.ru)
   
 * Run new Get Outfit Server in Docker from getoutfit image
   ```bash
-  docker run --name GetOutfit -p80:80 -d -w/GetOutfit getoutfit swift run -c release
+  docker run --name GetOutfit -p80:8888 -d -w/GetOutfit getoutfit swift run -c release
   ```
 
 ## Format of Sources/Server/Models/Shop+Data.swift
