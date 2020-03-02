@@ -19,6 +19,7 @@ extension XMLManager: XMLParserDelegate {
         Log.debug("START")
         #endif
 
+        parserDidEndDocumentCalled = false
         processedElements = []
         
         #if DEBUG

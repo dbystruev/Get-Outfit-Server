@@ -81,6 +81,13 @@ func setup(_ router: Router) {
         
         next()
     }
+
+    // MARK: - GET /memory
+    router.get() { request, response, next in
+        
+
+        next()
+    }
     
     // MARK: - GET /modified_times
     router.get("/modified_times") { request, response, next in

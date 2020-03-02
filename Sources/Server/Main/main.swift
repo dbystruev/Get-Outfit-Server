@@ -8,6 +8,7 @@ import Foundation
 import HeliumLogger
 import Kitura
 import LoggerAPI
+import SwiftMetrics
 import SwiftRedis
 
 #if DEBUG
@@ -17,6 +18,7 @@ HeliumLogger.use(.info)
 #endif
 
 let catalog = YMLCatalog()
+// let metrics = try SwiftMetrics()
 let redis = Redis()
 let router = Router()
 let xmlManager = XMLManager()
@@ -35,6 +37,7 @@ setup { loadedCatalog, error in
         catalog.shop = YMLShop.emptyShop
     }
     
+    // setup(metrics)
     setup(redis)
     setup(router)
 }

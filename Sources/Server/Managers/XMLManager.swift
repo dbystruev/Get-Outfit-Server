@@ -70,8 +70,8 @@ class XMLManager: NSObject {
     var processedElements = [XMLElement]()
     var rootElement: XMLElement?
 
-    let shop = Shop.all[0]
-    
+    let shop = Shop.all[0] // 0 – Lamoda, 1 — Farfetch
+
     lazy var remotePath = shop.remotePath
     
     // Get remote parameters from Admitad
@@ -143,6 +143,8 @@ class XMLManager: NSObject {
     }
     
     func parseLoaded(completion: @escaping (YMLCatalog?, Error?) -> Void) {
+        Log.debug("Selected \(shop.name) store")
+    
         guard let localURL = localURL else {
             completion(nil, Errors.invalidLocalURL(localPath ?? "nil"))
             return
@@ -191,10 +193,14 @@ class XMLManager: NSObject {
         }
         
         #if DEBUG
-        Log.debug("Requesting update from \(url.absoluteString)")
+        Log.debug("Started downloading from \(url.absoluteString)")
         #endif
         
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
+            #if DEBUG
+            Log.debug("Finished downloading \(url.absoluteString) \(error?.localizedDescription ?? "")")
+            #endif
+
             guard error == nil else {
                 completion(error)
                 return
