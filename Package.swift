@@ -11,7 +11,6 @@ let package = Package(
         .package(url: "https://github.com/IBM-Swift/Kitura-redis.git", .upToNextMajor(from: "2.1.1")),
         .package(url: "https://github.com/IBM-Swift/Kitura-StencilTemplateEngine.git", .upToNextMajor(from: "1.11.1")),
         .package(url: "https://github.com/IBM-Swift/swift-html-entities.git", .upToNextMajor(from: "3.0.13")),
-        .package(url: "https://github.com/RuntimeTools/SwiftMetrics.git", from: "2.6.4"),
     ],
     targets: [
         .target(
@@ -22,7 +21,6 @@ let package = Package(
                 "Kitura",
                 "KituraStencil",
                 "SwiftRedis",
-                "SwiftMetrics",
             ]
         ),
         .testTarget(

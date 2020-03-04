@@ -8,7 +8,6 @@ import Foundation
 import HeliumLogger
 import Kitura
 import LoggerAPI
-import SwiftMetrics
 import SwiftRedis
 
 #if DEBUG
