@@ -23,7 +23,7 @@ Server for [Get Outfit](https://getoutfit.ru)
 * If needed — save docker image on one server and load it on a different server
   ```bash
   # first server
-  docker image save -o getoutfit.tar
+  docker image save -o getoutfit.tar getoutfit
   scp getoutfit.tar server:/
   
   # second server
