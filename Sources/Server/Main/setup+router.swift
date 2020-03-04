@@ -81,13 +81,6 @@ func setup(_ router: Router) {
         
         next()
     }
-
-    // MARK: - GET /memory
-    router.get() { request, response, next in
-        
-
-        next()
-    }
     
     // MARK: - GET /modified_times
     router.get("/modified_times") { request, response, next in
@@ -130,8 +123,15 @@ func setup(_ router: Router) {
         }
         
         // MARK: "id"
-        if let id = request.queryParameters["id"] {
-            offers = offers?.filter { $0.id?.lowercased() == id.lowercased() }
+        if let ids = request.queryParametersMultiValues["id"]?.map({ $0.lowercased() }) {
+            if !ids.isEmpty {
+                offers = offers?.filter({
+                    if let id = $0.id?.lowercased() {
+                        return ids.contains(id)
+                    }
+                    return false
+                })
+            }
         }
         
         // MARK: "categoryId"
