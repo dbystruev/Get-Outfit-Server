@@ -105,27 +105,27 @@ func setup(_ router: Router) {
     router.get("/offers") { request, response, next in
         let requestStartTime = Date()
         
-        var offers = catalog.shop?.offers
+        var offers = catalog.shop?.offers ?? []
         
         // Show only available offers by default
         if request.queryParameters["available"] == nil && request.queryParameters["deleted"] == nil {
-            offers = offers?.filter { $0.available == true }
+            offers = offers.filter { $0.available == true }
         } else {
             // MARK: "available"
             if let available = request.queryParameters["available"] {
-                offers = offers?.filter { $0.available == Bool(available) }
+                offers = offers.filter { $0.available == Bool(available) }
             }
             
             // MARK: "deleted"
             if let deleted = request.queryParameters["deleted"] {
-                offers = offers?.filter { $0.deleted == Bool(deleted) }
+                offers = offers.filter { $0.deleted == Bool(deleted) }
             }
         }
         
         // MARK: "id"
         if let ids = request.queryParametersMultiValues["id"]?.map({ $0.lowercased() }) {
             if !ids.isEmpty {
-                offers = offers?.filter({
+                offers = offers.filter({
                     if let id = $0.id?.lowercased() {
                         return ids.contains(id)
                     }
@@ -136,7 +136,7 @@ func setup(_ router: Router) {
         
         // MARK: "categoryId"
         if let categoryId = request.queryParameters["categoryId"] {
-            offers = offers?.filter { $0.categoryId == Int(categoryId) }
+            offers = offers.filter { $0.categoryId == Int(categoryId) }
         }
         
         // MARK: "corner"
@@ -157,33 +157,33 @@ func setup(_ router: Router) {
             default:
                 categories = catalog.shop?.categories.compactMap({ $0.id }) ?? []
             }
-            offers = offers?.filter { categories.contains($0.categoryId) }
+            offers = offers.filter { categories.contains($0.categoryId) }
         }
         
         // MARK: "currencyId"
         if let currencyId = request.queryParameters["currencyId"] {
-            offers = offers?.filter { $0.currencyId?.lowercased() == currencyId.lowercased() }
+            offers = offers.filter { $0.currencyId?.lowercased() == currencyId.lowercased() }
         }
         
         // MARK: "description"
         if let description = request.queryParameters["description"] {
-            offers = offers?.filter { $0.description?.lowercased().contains(description.lowercased()) == true }
+            offers = offers.filter { $0.description?.lowercased().contains(description.lowercased()) == true }
         }
         
         // MARK: "manufacturer_warranty"
         if let manufacturer_warranty = request.queryParameters["manufacturer_warranty"] {
-            offers = offers?.filter { $0.manufacturer_warranty == Bool(manufacturer_warranty) }
+            offers = offers.filter { $0.manufacturer_warranty == Bool(manufacturer_warranty) }
         }
         
         // MARK: "model"
         if let model = request.queryParameters["model"] {
-            offers = offers?.filter { $0.model?.lowercased().contains(model.lowercased()) == true }
+            offers = offers.filter { $0.model?.lowercased().contains(model.lowercased()) == true }
         }
         
         // MARK: "modified_after"
         if let modified_after = request.queryParameters["modified_after"] {
             if let userTime = TimeInterval(modified_after) {
-                offers = offers?.filter { offer in
+                offers = offers.filter { offer in
                     guard let offerTime = offer.modified_time else { return false }
                     return userTime <= offerTime
                 }
@@ -193,7 +193,7 @@ func setup(_ router: Router) {
         // MARK: "modified_before"
         if let modified_before = request.queryParameters["modified_before"] {
             if let userTime = TimeInterval(modified_before) {
-                offers = offers?.filter { offer in
+                offers = offers.filter { offer in
                     guard let offerTime = offer.modified_time else { return false }
                     return offerTime <= userTime
                 }
@@ -202,23 +202,23 @@ func setup(_ router: Router) {
         
         // MARK: "modified_time"
         if let modified_time = request.queryParameters["modified_time"] {
-            offers = offers?.filter { $0.modified_time == TimeInterval(modified_time) }
+            offers = offers.filter { $0.modified_time == TimeInterval(modified_time) }
         }
         
         // MARK: "name"
         if let name = request.queryParameters["name"] {
-            offers = offers?.filter { $0.name?.lowercased().contains(name.lowercased()) == true }
+            offers = offers.filter { $0.name?.lowercased().contains(name.lowercased()) == true }
         }
         
         // MARK: "oldprice"
         if let oldprice = request.queryParameters["oldprice"] {
-            offers = offers?.filter { $0.oldprice == Decimal(string: oldprice) }
+            offers = offers.filter { $0.oldprice == Decimal(string: oldprice) }
         }
         
         // MARK: "oldprice_above"
         if let oldprice_above = request.queryParameters["oldprice_above"] {
             if let userOldPrice = Decimal(string: oldprice_above) {
-                offers = offers?.filter { offer in
+                offers = offers.filter { offer in
                     guard let offerOldPrice = offer.oldprice else { return false }
                     return userOldPrice <= offerOldPrice
                 }
@@ -228,7 +228,7 @@ func setup(_ router: Router) {
         // MARK: "oldprice_below"
         if let oldprice_below = request.queryParameters["oldprice_below"] {
             if let userOldPrice = Decimal(string: oldprice_below) {
-                offers = offers?.filter { offer in
+                offers = offers.filter { offer in
                     guard let offerOldPrice = offer.oldprice else { return false }
                     return offerOldPrice <= userOldPrice
                 }
@@ -236,26 +236,25 @@ func setup(_ router: Router) {
         }
         
         // MARK: "{params}"
-        if let paramNames = offers?.flatMap({ $0.params.compactMap({ param in param.name?.lowercased() }) }) {
-            for name in Set(paramNames).sorted() {
-                if let encodedName = name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
-                    if let value = request.queryParameters[encodedName]?.lowercased() {
-                        offers = offers?.filter { offer in
-                            for param in offer.params {
-                                if param.name?.lowercased() == name && param.value?.lowercased() == value {
-                                    return true
-                                }
+        let paramNames = offers.flatMap({ $0.params.compactMap({ param in param.name?.lowercased() }) })
+        for name in Set(paramNames).sorted() {
+            if let encodedName = name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
+                if let value = request.queryParameters[encodedName]?.lowercased() {
+                    offers = offers.filter { offer in
+                        for param in offer.params {
+                            if param.name?.lowercased() == name && param.value?.lowercased() == value {
+                                return true
                             }
-                            return false
                         }
+                        return false
                     }
                 }
             }
         }
-        
+            
         // MARK: "picture"
         if let picture = request.queryParameters["picture"] {
-            offers = offers?.filter { offer in
+            offers = offers.filter { offer in
                 for url in offer.pictures {
                     if url.absoluteString.lowercased().contains(picture.lowercased()) { return true }
                 }
@@ -265,13 +264,13 @@ func setup(_ router: Router) {
         
         // MARK: "price"
         if let price = request.queryParameters["price"] {
-            offers = offers?.filter { $0.price == Decimal(string: price) }
+            offers = offers.filter { $0.price == Decimal(string: price) }
         }
         
         // MARK: "price_above"
         if let price_above = request.queryParameters["price_above"] {
             if let userPrice = Decimal(string: price_above) {
-                offers = offers?.filter { offer in
+                offers = offers.filter { offer in
                     guard let offerPrice = offer.price else { return false }
                     return userPrice <= offerPrice
                 }
@@ -281,7 +280,7 @@ func setup(_ router: Router) {
         // MARK: "price_below"
         if let price_below = request.queryParameters["price_below"] {
             if let userPrice = Decimal(string: price_below) {
-                offers = offers?.filter { offer in
+                offers = offers.filter { offer in
                     guard let offerPrice = offer.price else { return false }
                     return offerPrice <= userPrice
                 }
@@ -290,27 +289,45 @@ func setup(_ router: Router) {
         
         // MARK: "sales_notes"
         if let sales_notes = request.queryParameters["sales_notes"] {
-            offers = offers?.filter { $0.sales_notes?.lowercased().contains(sales_notes.lowercased()) == true }
+            offers = offers.filter { $0.sales_notes?.lowercased().contains(sales_notes.lowercased()) == true }
         }
         
         // MARK: "typePrefix"
         if let typePrefix = request.queryParameters["typePrefix"] {
-            offers = offers?.filter { $0.typePrefix?.lowercased().contains(typePrefix.lowercased()) == true }
+            offers = offers.filter { $0.typePrefix?.lowercased().contains(typePrefix.lowercased()) == true }
         }
         
         // MARK: "url"
         if let url = request.queryParameters["url"] {
-            offers = offers?.filter { $0.url?.absoluteString.lowercased().contains(url.lowercased()) == true }
+            offers = offers.filter { $0.url?.absoluteString.lowercased().contains(url.lowercased()) == true }
         }
         
         // MARK: "vendor"
         if let vendor = request.queryParameters["vendor"] {
-            offers = offers?.filter { $0.vendor?.lowercased().contains(vendor.lowercased()) == true }
+            offers = offers.filter { $0.vendor?.lowercased().contains(vendor.lowercased()) == true }
         }
         
         // MARK: "vendorCode"
         if let vendorCode = request.queryParameters["vendorCode"] {
-            offers = offers?.filter { $0.vendorCode?.lowercased() == vendorCode.lowercased() }
+            offers = offers.filter { $0.vendorCode?.lowercased() == vendorCode.lowercased() }
+        }
+        
+        // MARK: "from"
+        if let from = request.queryParameters["from"]?.int {
+            if 0 < from {
+                if from < offers.count {
+                    offers = Array(offers[from...])
+                } else {
+                    offers = []
+                }
+            }
+        }
+        
+        // MARK: "limit"
+        if let limit = request.queryParameters["limit"]?.int {
+            if 0 <= limit && limit < offers.count {
+                offers = Array(offers[..<limit])
+            }
         }
         
         let isCounting = request.queryParameters["count"] != nil
@@ -322,7 +339,7 @@ func setup(_ router: Router) {
             response.send(json: ["duration": duration])
         } else if isCounting {
             // MARK: "count"
-            response.send(json: ["count": offers?.count])
+            response.send(json: ["count": offers.count])
         } else {
             response.send(json: offers)
         }

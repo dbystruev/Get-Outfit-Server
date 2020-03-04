@@ -78,6 +78,8 @@ extension Shop {
   - [?categoryId=1017](http://server.getoutfit.ru/offers?categoryId=1017)
   - [?currencyId=RUB](http://server.getoutfit.ru/offers?currencyId=RUB)
   - [?description=футболка](http://server.getoutfit.ru/offers?description=футболка)
+  - [?from=1000](http://server.getoutfit.ru/offers?from=1000)
+  - [?limit=100](http://server.getoutfit.ru/offers?limit=100)
   - [?manufacturer_warranty=true](http://server.getoutfit.ru/offers?manufacturer_warranty=true)
   - [?model=adidas](http://server.getoutfit.ru/offers?model=adidas)
   - [?modified_after=1569058481](http://server.getoutfit.ru/offers?modified_after=1569058481)
