@@ -19,6 +19,7 @@ import LoggerAPI
 class XMLManager: NSObject {
     // MARK: - Errors
     enum Errors: Swift.Error {
+        case alreadyDownloading
         case cantCreateXMLParser(URL)
         case cantParse
         case emptyCatalog
@@ -32,6 +33,8 @@ class XMLManager: NSObject {
         
         var description: String {
             switch self {
+            case .alreadyDownloading:
+                return "Already downloading"
             case .cantCreateXMLParser(let url):
                 return "Can't create XML parser for \(url)"
             case .cantParse:
@@ -66,6 +69,7 @@ class XMLManager: NSObject {
     #endif
     
     var completion: ((YMLCatalog?, Error?) -> Void)?
+    var isDownloading = false
     var parserDidEndDocumentCalled = false
     var processedElements = [XMLElement]()
     var rootElement: XMLElement?
@@ -191,12 +195,21 @@ class XMLManager: NSObject {
             completion(Errors.invalidRemoteURL(remotePath))
             return
         }
+
+        guard !isDownloading else {
+            completion(Errors.alreadyDownloading)
+            return
+        }
+
+        isDownloading = true
         
         #if DEBUG
         Log.debug("Started downloading from \(url.absoluteString)")
         #endif
         
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
+            self.isDownloading = false
+
             #if DEBUG
             Log.debug("Finished downloading \(url.absoluteString) \(error?.localizedDescription ?? "")")
             #endif

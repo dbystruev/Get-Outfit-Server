@@ -19,17 +19,19 @@ func loadCatalog(completion: @escaping (YMLCatalog?, Error?) -> Void) {
         let catalog = try? decoder.decode(YMLCatalog.self, from: savedData)
     {
         #if DEBUG
-        Log.debug(
-            "Found local catalog \(catalog)"
-        )
+        Log.debug("Found saved catalog \(catalog) in UserDefaults")
         #endif
         
         completion(catalog, nil)
         return
     }
+
+    #if DEBUG
+    Log.debug("No saved UserDefaults data for \(YMLCatalog.self)")
+    #endif
     
     // MARK: Try to load into XML file/parse it
-    xmlManager.loadAndParseLocally(using: "XML/update.xml") { catalog, error in
+    xmlManager.loadAndParseLocally(using: "XML/full.xml") { catalog, error in
         if let error = error {
             completion(nil, error)
             return
@@ -41,9 +43,7 @@ func loadCatalog(completion: @escaping (YMLCatalog?, Error?) -> Void) {
         }
         
         #if DEBUG
-        Log.debug(
-            "Parsed XML catalog \(catalog)"
-        )
+        Log.debug("Parsed XML catalog \(catalog)")
         #endif
         
         save(catalog)
@@ -60,7 +60,7 @@ func save(_ catalog: YMLCatalog) {
     }
     
     #if DEBUG
-    Log.debug("Saving catalog locally \(catalog)")
+    Log.debug("Saving catalog \(catalog) to UserDefaults")
     #endif
     
     UserDefaults.standard.set(encodedCatalog, forKey: "\(YMLCatalog.self)")
@@ -75,9 +75,7 @@ func setup(completion: @escaping (YMLCatalog?, Error?) -> Void) {
         }
         
         #if DEBUG
-        Log.debug(
-            "Loaded catalog \(catalog)"
-        )
+        Log.debug("Loaded catalog locally \(catalog)")
         #endif
         
         let yesterday = Date().addingTimeInterval(-86400)
