@@ -35,7 +35,8 @@ setup { loadedCatalog, error in
         catalog.shop = YMLShop.emptyShop
     }
     
-    setup(redis)
+    // setup(redis)
+    setupCORS(router)
     setup(router)
 }
 
