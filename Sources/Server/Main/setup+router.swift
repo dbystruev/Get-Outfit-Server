@@ -87,8 +87,25 @@ func setup(_ router: Router) {
 
   // MARK: - GET /images
   router.get("/images") { request, response, next in
-    let images = Set(catalog.shop?.offers.flatMap { $0.pictures } ?? []).sorted()
+    var images = Set(catalog.shop?.offers.flatMap { $0.pictures } ?? []).sorted()
 
+    // MARK: "from"
+    if let from = request.queryParameters["from"]?.int {
+      if 0 < from {
+        if from < images.count {
+          images = Array(images[from...])
+        } else {
+          images = []
+        }
+      }
+    }
+
+    // MARK: "limit"
+    let limit = request.queryParameters["limit"]?.int ?? 25
+    if 0 <= limit && limit < images.count {
+      images = Array(images[..<limit])
+    }
+    
     // MARK: "count"
     if request.queryParameters["count"] == nil {
       response.send(json: images)
