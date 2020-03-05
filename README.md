@@ -2,7 +2,7 @@
 
 Server for [Get Outfit](https://getoutfit.ru)
 
-* Install Get Outfit Server in Docker from Swift image
+* Install Get Outfit Server on development server
   ```bash
   docker run -p80:8888 -it --name GetOutfit -w/GetOutfit swift bash
   mkdir -p $HOME/Documents/XML
@@ -14,40 +14,41 @@ Server for [Get Outfit](https://getoutfit.ru)
   exit
   ```
 
-* Create build image and load initial data
-    ```docker commit GetOutfit getoutfit_build
+* Create build image on development server, save it and copy to production server
+    ```bash
+    docker commit GetOutfit getoutfit_build
     docker rm GetOutfit
-    docker run --name GetOutfit -p80:8888 -d -w/GetOutfit getoutfit_build swift run -c release
-    docker logs -f GetOutfit
+    docker image save -o getoutfit.tar getoutfit_build
+    docker rmi getoutfit_build
+    scp getoutfit.tar production-server:\~/
+    rm getoutfit.tar
+    ```
+
+* Create build image on production server
+    ```bash
+    docker image load -i getoutfit.tar
+    rm getoutfit.tar
+    docker run --name GetOutfit_build -p8888:8888 -d -w/GetOutfit getoutfit_build swift run -c release
+    docker logs -f GetOutfit_build
     # after the server has been compiled & started press Ctrl-C on Linux or Cmd-. on macOS
-    curl localhost/update
-    docker exec GetOutfit mv /root/Documents/XML/update.xml /root/Documents/XML/full.xml
-    docker stop GetOutfit
+    curl localhost:8888/update
+    docker exec GetOutfit_build mv /root/Documents/XML/update.xml /root/Documents/XML/full.xml
+    docker stop GetOutfit_build
     
     ```
   
-* Create release image
+* Create release image on production server
   ```bash
-  docker commit GetOutfit getoutfit_release
-  docker rm GetOutfit
+  docker commit GetOutfit_build getoutfit_release
+  docker rm GetOutfit_build
   docker rmi getoutfit_build
-  ```
-
-* Save docker image on development server and copy it to production server
-  ```bash
-  docker image save -o getoutfit.tar getoutfit_release
-  docker rmi getoutfit_release
-  scp getoutfit.tar production-server:\~/
-  rm getoutfit.tar
   ```
   
 * Load and run docker image on production server
 ```bash
- docker image load -i getoutfit.tar
- rm getoutfit.tar
  docker stop GetOutfit && docker rm GetOutfit && docker rmi getoutfit && docker tag getoutfit_release getoutfit && docker run --name GetOutfit -p80:8888 -d -w/GetOutfit getoutfit swift run -c release
  docker rmi getoutfit_release
-  ```
+ ```
 
 ## Format of Sources/Server/Models/RemoteShop+Data.swift
 ```swift
