@@ -87,16 +87,9 @@ func setup(_ router: Router) {
     
     // MARK: - GET /images
     router.get("/images") { request, response, next in
-        var images = (catalog.shop?.offers.filter { $0.available == true }.flatMap({ order in
-            order.pictures.compactMap({
-                $0 == nil ? nil : Image(
-                    imageURL: $0!.absoluteString,
-                    orderID: order.id ?? "No Order ID",
-                    orderURL: order.url?.absoluteString ?? "No Order URL",
-                    title: order.name ?? "No Name"
-                )
-            })
-        }) ?? []).sorted { $0.title < $1.title }
+        let requestStartTime = Date()
+        
+        var images = catalog.shop?.images ?? []
         
         let total = images.count
         
@@ -115,8 +108,13 @@ func setup(_ router: Router) {
         // MARK: "format"
         let isHtml = request.queryParameters["format"]?.string.lowercased() == "html"
         
-        // MARK: "count"
-        if request.queryParameters["count"] == nil {
+        // MARK: "duration"
+        let isTiming = request.queryParameters["duration"] != nil
+        
+        if isTiming {
+            let duration = Date().timeIntervalSince(requestStartTime)
+            response.send(json: ["duration": duration])
+        } else if request.queryParameters["count"] == nil {
             if isHtml {
                 let context: [String: Codable] = [
                     "from": from,
@@ -131,6 +129,7 @@ func setup(_ router: Router) {
             } else {
                 response.send(json: images)
             }
+        // MARK: "count"
         } else {
             response.send(json: ["count": images.count])
         }

@@ -109,10 +109,10 @@ div.desc {
 {% for image in images %}
 <div class="responsive">
   <div class="gallery">
-    <a target="_blank" href="{{ image.orderURL }}">
-      <img src="{{ image.imageURL }}" alt="{{ image.title }}" width="600" height="400">
+    <a target="_blank" href="{{ image.offerURL }}">
+      <img src="{{ image.url }}" alt="{{ image.offerName }}" width="600" height="400">
     </a>
-    <div class="desc">{{ image.title }} ({{ image.orderID }})</div>
+    <div class="desc">{{ image.offerName }} ({{ image.offerId }})</div>
   </div>
 </div>
 {% endfor %}

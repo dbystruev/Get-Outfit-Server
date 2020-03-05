@@ -10,12 +10,26 @@ import Foundation
 import LoggerAPI
 
 struct YMLShop: Codable {
-    var title: String?
-    var company: String?
-    var url: URL?
     var categories = [YMLCategory]()
+    var company: String?
     var currencies = [YMLCurrency]()
+    var images: [Image] = []
     var offers = [YMLOffer]()
+    var title: String?
+    var url: URL?
+    
+    mutating func reloadImages() {
+        images = offers.filter { $0.available == true }.flatMap({ offer in
+            offer.pictures.compactMap({
+                $0 == nil ? nil : Image(
+                    url: $0!.absoluteString,
+                    offerId: offer.id ?? "No offer id",
+                    offerURL: offer.url?.absoluteString ?? "No offer URL",
+                    offerName: offer.name ?? "No offer name"
+                )
+            })
+        }).sorted { $0.offerName < $1.offerName }
+    }
 }
 
 // MARK: - XMLElement
@@ -55,9 +69,9 @@ extension YMLShop: XMLElement {
     }
     
     mutating func addChild(_ child: XMLElement) {
-//        #if DEBUG
-//        Log.debug("\(child.elementName), children: \(child.children)")
-//        #endif
+        //        #if DEBUG
+        //        Log.debug("\(child.elementName), children: \(child.children)")
+        //        #endif
         
         switch child.elementName {
         case "title":
@@ -130,12 +144,12 @@ extension YMLShop: XMLElement {
 extension YMLShop {
     static var emptyShop: YMLShop {
         return YMLShop(
-            title: "Empty Shop",
-            company: "Empty Company",
-            url: URL(string: "http://getoutfit.ru"),
             categories: [],
+            company: "Empty Company",
             currencies: [],
-            offers: []
+            offers: [],
+            title: "Empty Shop",
+            url: URL(string: "http://getoutfit.ru")
         )
     }
 }

@@ -35,6 +35,8 @@ setup { loadedCatalog, error in
         catalog.shop = YMLShop.emptyShop
     }
     
+    catalog.reloadImages()
+    
     // setup(redis)
     setupCORS(router)
     setup(router)

@@ -10,6 +10,10 @@ import Foundation
 class YMLCatalog: Codable {
     var date: Date?
     var shop: YMLShop?
+    
+    func reloadImages() {
+        shop?.reloadImages()
+    }
 }
 
 // MARK: - XMLElement
@@ -42,7 +46,7 @@ extension YMLCatalog: XMLElement {
             self.shop = shop
         }
     }
-
+    
     func update(with element: XMLElement) {
         if let catalog = element as? Self {
             date = catalog.date ?? date
@@ -52,6 +56,7 @@ extension YMLCatalog: XMLElement {
                 } else {
                     shop?.update(with: updatedShop)
                 }
+                reloadImages()
             }
         }
     }

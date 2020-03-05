@@ -74,19 +74,19 @@ class XMLManager: NSObject {
     var processedElements = [XMLElement]()
     var rootElement: XMLElement?
 
-    let shop = Shop.all[0] // 0 – Lamoda, 1 — Farfetch
+    let remoteShop = RemoteShop.all[0] // 0 – Lamoda, 1 — Farfetch
 
-    lazy var remotePath = shop.remotePath
+    lazy var remotePath = remoteShop.path
     
     // Get remote parameters from Admitad
     lazy var remoteParameters = [
-        "currency": shop.currency,
-        "code": shop.code,
-        "feed_id": shop.feed_id,
-        "last_import": shop.last_import,
-        "template": shop.template,
-        "user": shop.user,
-        "format": shop.format,
+        "currency": remoteShop.currency,
+        "code": remoteShop.code,
+        "feed_id": remoteShop.feed_id,
+        "last_import": remoteShop.last_import,
+        "template": remoteShop.template,
+        "user": remoteShop.user,
+        "format": remoteShop.format,
     ]
     
     var localPath: String?
@@ -147,7 +147,7 @@ class XMLManager: NSObject {
     }
     
     func parseLoaded(completion: @escaping (YMLCatalog?, Error?) -> Void) {
-        Log.debug("Selected \(shop.name) store")
+        Log.debug("Selected \(remoteShop.name) store")
     
         guard let localURL = localURL else {
             completion(nil, Errors.invalidLocalURL(localPath ?? "nil"))

@@ -7,8 +7,8 @@
 import Stencil
 
 struct Image: Codable {
-    let imageURL: String
-    let orderID: String
-    let orderURL: String
-    let title: String
+    let url: String
+    let offerId: String
+    let offerURL: String
+    let offerName: String
 }

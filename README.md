@@ -2,64 +2,77 @@
 
 Server for [Get Outfit](https://getoutfit.ru)
 
-* Run Get Outfit Server in Docker from Swift image
+* Install Get Outfit Server in Docker from Swift image
   ```bash
   docker run -p80:8888 -it --name GetOutfit -w/GetOutfit swift bash
   mkdir -p $HOME/Documents/XML
   git clone https://github.com/dbystruev/Get-Outfit-Server.git .
   apt update && apt -y upgrade
   apt -y install openssl libssl-dev libmysqlclient-dev libcurl4-openssl-dev vim
-  vi Sources/Server/Models/Shop+Data.swift # fill with your Admitad data (see below)
-  swift build -c release
+  mv Sources/Server/Models/RemoteShop+Data+sample.swift Sources/Server/Models/RemoteShop+Data.swift
+  vi Sources/Server/Models/RemoteShop+Data.swift # fill with your Admitad data (see below)
   exit
   ```
+
+* Create build image and load initial data
+    ```docker commit GetOutfit getoutfit_build
+    docker rm GetOutfit
+    docker run --name GetOutfit -p80:8888 -d -w/GetOutfit getoutfit_build swift run -c release
+    docker logs -f GetOutfit
+    # after the server has been compiled & started press Ctrl-C on Linux or Cmd-. on macOS
+    curl localhost/update
+    docker exec GetOutfit mv /root/Documents/XML/update.xml /root/Documents/XML/full.xml
+    docker stop GetOutfit
+    
+    ```
   
-* Create getoutfit image
+* Create release image
   ```bash
-  docker commit GetOutfit getoutfit
+  docker commit GetOutfit getoutfit_release
   docker rm GetOutfit
+  docker rmi getoutfit_build
   ```
 
-* If needed — save docker image on one server and load it on a different server
+* Save docker image on development server and copy it to production server
   ```bash
-  # first server
-  docker image save -o getoutfit.tar getoutfit
-  scp getoutfit.tar server:/
-  
-  # second server
-  docker stop GetOutfit
-  docker rm GetOutfit
-  docker image rm getoutfit
-  docker image load -i getoutfit.tar
+  docker image save -o getoutfit.tar getoutfit_release
+  docker rmi getoutfit_release
+  scp getoutfit.tar production-server:\~/
+  rm getoutfit.tar
   ```
   
-* Run new Get Outfit Server in Docker from getoutfit image
-  ```bash
-  docker run --name GetOutfit -p80:8888 -d -w/GetOutfit getoutfit swift run -c release
+* Load and run docker image on production server
+```bash
+ docker image load -i getoutfit.tar
+ rm getoutfit.tar
+ docker stop GetOutfit && docker rm GetOutfit && docker rmi getoutfit && docker tag getoutfit_release getoutfit && docker run --name GetOutfit -p80:8888 -d -w/GetOutfit getoutfit swift run -c release
+ docker rmi getoutfit_release
   ```
 
-## Format of Sources/Server/Models/Shop+Data.swift
+## Format of Sources/Server/Models/RemoteShop+Data.swift
 ```swift
-extension Shop {
-    static var all: [Shop] {
+extension RemoteShop {
+    static var all: [RemoteShop] {
         return [
-            Shop(
+            RemoteShop(
                 code: "Get from Admitad",
                 currency: "RUB",
                 feed_id: "Get from Admitad",
+                format: "xml",
                 last_import: "2000.01.01.00.00",
                 name: "First Shop Name",
-                remotePath: "http://export.admitad.com/ru/webmaster/websites/838792/products/export_adv_products/",
+                path: "http://export.admitad.com/ru/webmaster/websites/838792/products/export_adv_products/",
                 template: "Get from Admitad",
                 user: "Get from Admitad"
             ),
-            Shop(
+            RemoteShop(
                 code: "Get from Admitad",
                 currency: "RUB",
                 feed_id: "Get from Admitad",
+                format: "xml",
                 last_import: "2000.01.01.00.00",
                 name: "Second Shop Name",
-                remotePath: "http://export.admitad.com/ru/webmaster/websites/838792/products/export_adv_products/",
+                path: "http://export.admitad.com/ru/webmaster/websites/838792/products/export_adv_products/",
                 template: "Get from Admitad",
                 user: "Get from Admitad"
             ),
@@ -82,6 +95,7 @@ extension Shop {
 - [/date](http://server.getoutfit.ru/date) Return the last date the database was updated
 - [/images](http://server.getoutfit.ru/images) Return the list of all images sorted alphabetically
   - [?count=true](http://server.getoutfit.ru/images?count=true) Return the number of images instead of their list
+  - [?duration=true](http://server.getoutfit.ru/images?duration=true) Return the time spent on request instead of images list
   - [?format=html](http://server.getoutfit.ru/images?format=html) Display the images in HTML format instead of JSON
   - [?from=100](http://server.getoutfit.ru/images?from=100) Skip the given number of images (for pagination)
   - [?limit=24](http://server.getoutfit.ru/images?limit=24) Limit the total number of images returned (for pagination).  24 is the default
