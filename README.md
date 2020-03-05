@@ -73,7 +73,7 @@ extension Shop {
 - [/categories](http://server.getoutfit.ru/categories) Return the list of categories
   - [?from=100](http://server.getoutfit.ru/categories?from=100) Skip the given number of categories (for pagination)
   - [?id=1](http://server.getoutfit.ru/categories?id=1) Return a category with a given id
-  - [?limit=25](http://server.getoutfit.ru/categories?limit=25) Limit the total number of categories returned (for pagination).  25 is the default
+  - [?limit=24](http://server.getoutfit.ru/categories?limit=24) Limit the total number of categories returned (for pagination).  24 is the default
   - [?name=обувь](http://server.getoutfit.ru/categories?name=обувь) Return the list of categories with given word in category name
   - [?parentId=1](http://server.getoutfit.ru/categories?parentId=1) Return a category whose parent has a given parent ID
   - [?count=true](http://server.getoutfit.ru/categories?count=true) Return the number of categories instead of their list
@@ -82,8 +82,9 @@ extension Shop {
 - [/date](http://server.getoutfit.ru/date) Return the last date the database was updated
 - [/images](http://server.getoutfit.ru/images) Return the list of all images sorted alphabetically
   - [?count=true](http://server.getoutfit.ru/images?count=true) Return the number of images instead of their list
+  - [?format=html](http://server.getoutfit.ru/images?format=html) Display the images in HTML format instead of JSON
   - [?from=100](http://server.getoutfit.ru/images?from=100) Skip the given number of images (for pagination)
-  - [?limit=25](http://server.getoutfit.ru/images?limit=25) Limit the total number of images returned (for pagination).  25 is the default
+  - [?limit=24](http://server.getoutfit.ru/images?limit=24) Limit the total number of images returned (for pagination).  24 is the default
 - [/modified_times](http://server.getoutfit.ru/modified_times) Return the earliest and latest offer modification times (as Unix timestamps)
 - [/offers](http://server.getoutfit.ru/offers) Return the list of all offers/goods
   - [?available=true](http://server.getoutfit.ru/offers?available=true) Filter by available offers only (set by default)
@@ -96,7 +97,7 @@ extension Shop {
   - [?currencyId=RUB](http://server.getoutfit.ru/offers?currencyId=RUB) Return the list of offers with price in a given currency
   - [?description=футболка](http://server.getoutfit.ru/offers?description=футболка) Filter the list of offers by a given word in offer's description
   - [?from=1000](http://server.getoutfit.ru/offers?from=1000) Skip the given number of offers (for pagination)
-  - [?limit=25](http://server.getoutfit.ru/offers?limit=25) Limit the total number of offers returned (for pagination).  25 is the default
+  - [?limit=24](http://server.getoutfit.ru/offers?limit=24) Limit the total number of offers returned (for pagination).  24 is the default
   - [?manufacturer_warranty=true](http://server.getoutfit.ru/offers?manufacturer_warranty=true) Filter the list of offers by manufacturer warranty
   - [?model=adidas](http://server.getoutfit.ru/offers?model=adidas) Limit the list of offers to those containing the given word
   - [?modified_after=1569058481](http://server.getoutfit.ru/offers?modified_after=1569058481) Limit the offers to those modified after the given time (as Unix timestamp)
