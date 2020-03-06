@@ -19,18 +19,23 @@ struct YMLShop: Codable {
   var url: URL?
 
   mutating func reloadImages() {
-    images = offers.filter { $0.available == true }.flatMap({ offer in
+    let availableOffers = offers.filter { $0.available == true }
+    let unsortedImages = availableOffers.flatMap({ offer in
       offer.pictures.compactMap({
         $0 == nil
           ? nil
           : Image(
-            offerId: offer.id ?? "No offer id",
-            offerURL: offer.url?.absoluteString ?? "No offer URL",
-            offerName: offer.name ?? "No offer name",
+            categoryId: offer.categoryId,
+            offerId: offer.id,
+            offerURL: offer.url?.absoluteString,
+            offerName: offer.name,
             url: $0!.absoluteString
           )
       })
-    }).sorted { $0.offerName < $1.offerName }
+    })
+    images = unsortedImages.sorted {
+      $0.offerName == nil || $1.offerName == nil ? $0.url < $1.url : $0.offerName! < $1.offerName!
+    }
   }
 }
 

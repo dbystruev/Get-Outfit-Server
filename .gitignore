@@ -4,6 +4,8 @@
 /Packages
 /*.xcodeproj
 /Package.resolved
-/Sources/Server/Models/RemoteShop+Data*.swift
 nohup.out
 .vscode
+
+# git update-index --assume-unchanged Sources/Server/Models/RemoteShop+Data.swift
+RemoteShop+Data.swift

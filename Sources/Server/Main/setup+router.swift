@@ -24,8 +24,15 @@ func setup(_ router: Router) {
     var categories = catalog.shop?.categories ?? []
 
     // MARK: "id"
-    if let id = request.queryParameters["id"] {
-      categories = categories.filter { $0.id == Int(id) }
+    if let ids = request.queryParametersMultiValues["id"]?.compactMap({ Int($0) }),
+      !ids.isEmpty
+    {
+      categories = categories.filter({
+        if let id = $0.id {
+          return ids.contains(id)
+        }
+        return false
+      })
     }
 
     // MARK: "name"
@@ -88,8 +95,49 @@ func setup(_ router: Router) {
   // MARK: - GET /images
   router.get("/images") { request, response, next in
     let requestStartTime = Date()
-
     var images = catalog.shop?.images ?? []
+    var urlParams = ""
+
+    // MARK: "categoryId"
+    if let categoryIds = request.queryParametersMultiValues["categoryId"]?.compactMap({ Int($0) }),
+      !categoryIds.isEmpty
+    {
+      images = images.filter({
+        if let categoryId = $0.categoryId {
+          return categoryIds.contains(categoryId)
+        }
+        return false
+      })
+    }
+
+    // MARK: "offerId"
+    if let offerIds = request.queryParametersMultiValues["offerId"]?.map({ $0.lowercased() }),
+      !offerIds.isEmpty
+    {
+      images = images.filter({
+        if let offerId = $0.offerId?.lowercased() {
+          return offerIds.contains(offerId)
+        }
+        return false
+      })
+    }
+
+    // MARK: "offerName"
+    if let words = request.queryParametersMultiValues["offerName"]?.map({ $0.lowercased() }),
+      !words.isEmpty
+    {
+      urlParams += "&offerName=\(words.joined(separator: "&offerName="))"
+
+      images = images.filter({
+        if let offerName = $0.offerName?.lowercased() {
+          for word in words {
+            guard offerName.contains(word) else { return false }
+          }
+          return true
+        }
+        return false
+      })
+    }
 
     let total = images.count
 
@@ -125,6 +173,7 @@ func setup(_ router: Router) {
           "left500": from - 500,
           "left100": from - 100,
           "left": from - 24,
+          "urlParams": urlParams,
           "right": from + 24,
           "right100": from + 100,
           "right500": from + 500,
@@ -184,20 +233,27 @@ func setup(_ router: Router) {
     }
 
     // MARK: "id"
-    if let ids = request.queryParametersMultiValues["id"]?.map({ $0.lowercased() }) {
-      if !ids.isEmpty {
-        offers = offers.filter({
-          if let id = $0.id?.lowercased() {
-            return ids.contains(id)
-          }
-          return false
-        })
-      }
+    if let ids = request.queryParametersMultiValues["id"]?.map({ $0.lowercased() }),
+      !ids.isEmpty
+    {
+      offers = offers.filter({
+        if let id = $0.id?.lowercased() {
+          return ids.contains(id)
+        }
+        return false
+      })
     }
 
     // MARK: "categoryId"
-    if let categoryId = request.queryParameters["categoryId"] {
-      offers = offers.filter { $0.categoryId == Int(categoryId) }
+    if let categoryIds = request.queryParametersMultiValues["categoryId"]?.compactMap({ Int($0) }),
+      !categoryIds.isEmpty
+    {
+      offers = offers.filter({
+        if let categoryId = $0.categoryId {
+          return categoryIds.contains(categoryId)
+        }
+        return false
+      })
     }
 
     // MARK: "corner"
@@ -269,8 +325,18 @@ func setup(_ router: Router) {
     }
 
     // MARK: "name"
-    if let name = request.queryParameters["name"] {
-      offers = offers.filter { $0.name?.lowercased().contains(name.lowercased()) == true }
+    if let words = request.queryParametersMultiValues["name"]?.map({ $0.lowercased() }),
+      !words.isEmpty
+    {
+      offers = offers.filter({
+        if let name = $0.name?.lowercased() {
+          for word in words {
+            guard name.contains(word) else { return false }
+          }
+          return true
+        }
+        return false
+      })
     }
 
     // MARK: "oldprice"

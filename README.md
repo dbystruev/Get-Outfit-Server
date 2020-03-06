@@ -83,31 +83,36 @@ extension RemoteShop {
 - [/categories](http://server.getoutfit.ru/categories) Return the list of categories
   - [?from=100](http://server.getoutfit.ru/categories?from=100) Skip the given number of categories (for pagination)
   - [?id=1](http://server.getoutfit.ru/categories?id=1) Return a category with a given id
+  - [?id=2199&id=7187](http://server.getoutfit.ru/categories?id=2199&id=7187) Return the list of categories with given ids
   - [?limit=24](http://server.getoutfit.ru/categories?limit=24) Limit the total number of categories returned (for pagination).  24 is the default
   - [?name=обувь](http://server.getoutfit.ru/categories?name=обувь) Return the list of categories with given word in category name
-  - [?parentId=1](http://server.getoutfit.ru/categories?parentId=1) Return a category whose parent has a given parent ID
+  - [?parentId=1](http://server.getoutfit.ru/categories?parentId=1) Return a category whose parent has a given parent id
   - [?count=true](http://server.getoutfit.ru/categories?count=true) Return the number of categories instead of their list
 - [/currencies](http://server.getoutfit.ru/currencies) Return the list of currencies
   - [?count=true](http://server.getoutfit.ru/currencies?count=true) Return the number of currencies instead of their list
 - [/date](http://server.getoutfit.ru/date) Return the last date the database was updated
 - [/images](http://server.getoutfit.ru/images) Return the list of all images sorted alphabetically
+  - [?categoryId=2199&categoryId=7187](http://server.getoutfit.ru/images?categoryId=2199&categoryId=7187) Return the list of images in given categories
   - [?count=true](http://server.getoutfit.ru/images?count=true) Return the number of images instead of their list
   - [?duration=true](http://server.getoutfit.ru/images?duration=true) Return the time spent on request instead of images list
   - [?format=html](http://server.getoutfit.ru/images?format=html) Display the images in HTML format instead of JSON
   - [?from=100](http://server.getoutfit.ru/images?from=100) Skip the given number of images (for pagination)
   - [?limit=24](http://server.getoutfit.ru/images?limit=24) Limit the total number of images returned (for pagination).  24 is the default
+  - [?offerId=AD093FUALPE7&offerId=AN057AUBZ383](http://server.getoutfit.ru/images?offerId=AD093FUALPE7&offerId=AN057AUBZ383) Return the list of images of given offer ids
+  - [?offerName=кроссовки&offerName=asics](http://server.getoutfit.ru/images?offerName=кроссовки&offerName=asics) Return the list of images for offers whose names contain all search terms
 - [/modified_times](http://server.getoutfit.ru/modified_times) Return the earliest and latest offer modification times (as Unix timestamps)
 - [/offers](http://server.getoutfit.ru/offers) Return the list of all offers/goods
   - [?available=true](http://server.getoutfit.ru/offers?available=true) Filter by available offers only (set by default)
-  - [?count=true](http://server.getoutfit.ru/offers?count=true) Return the number of offers instead of their list
-  - [?deleted=true](http://server.getoutfit.ru/offers?deleted=true) Filter by deleted offers only
-  - [?duration=true](http://server.getoutfit.ru/offers?duration=true) Return the time spent on request instead of offers list
-  - [?id=AD093FUALPE7](http://server.getoutfit.ru/offers?id=AD093FUALPE7) Return an offer with a given ID
-  - [?id=AD093FUALPE7&id=AN057AUBZ383](http://server.getoutfit.ru/offers?id=AD093FUALPE7&id=AN057AUBZ383) Return the list of offers with given IDs
   - [?categoryId=1017](http://server.getoutfit.ru/offers?categoryId=1017) Return the list of offers in a given category
+  - [?categoryId=2199&categoryId=7187](http://server.getoutfit.ru/categories?categoryId=2199&categoryId=7187) Return the list of offers in given categories
+  - [?count=true](http://server.getoutfit.ru/offers?count=true) Return the number of offers instead of their list
   - [?currencyId=RUB](http://server.getoutfit.ru/offers?currencyId=RUB) Return the list of offers with price in a given currency
+  - [?deleted=true](http://server.getoutfit.ru/offers?deleted=true) Filter by deleted offers only
   - [?description=футболка](http://server.getoutfit.ru/offers?description=футболка) Filter the list of offers by a given word in offer's description
+  - [?duration=true](http://server.getoutfit.ru/offers?duration=true) Return the time spent on request instead of offers list
   - [?from=1000](http://server.getoutfit.ru/offers?from=1000) Skip the given number of offers (for pagination)
+  - [?id=AD093FUALPE7](http://server.getoutfit.ru/offers?id=AD093FUALPE7) Return an offer with a given ID
+  - [?id=AD093FUALPE7&id=AN057AUBZ383](http://server.getoutfit.ru/offers?id=AD093FUALPE7&id=AN057AUBZ383) Return the list of offers with given ids
   - [?limit=24](http://server.getoutfit.ru/offers?limit=24) Limit the total number of offers returned (for pagination).  24 is the default
   - [?manufacturer_warranty=true](http://server.getoutfit.ru/offers?manufacturer_warranty=true) Filter the list of offers by manufacturer warranty
   - [?model=adidas](http://server.getoutfit.ru/offers?model=adidas) Limit the list of offers to those containing the given word
@@ -115,6 +120,7 @@ extension RemoteShop {
   - [?modified_before=1569058481](http://server.getoutfit.ru/offers?modified_before=1569058481) Limit the offers to those modified before the given time (as Unix timestamp)
   - [?modified_time=1569058481](http://server.getoutfit.ru/offers?modified_time=1569058481) Limit the offers to those modified exactly at the given time (as Unix timestamp)
   - [?name=кроссовки](http://server.getoutfit.ru/offers?name=кроссовки) Limit the list of offers to those whose name contains a given word
+  - [?name=кроссовки&name=asics](http://server.getoutfit.ru/images?name=кроссовки&name=asics) Return the list of offers whose names contain all search terms
   - [?oldprice=999](http://server.getoutfit.ru/offers?oldprice=999) Limit the offers to those whose old price is equal to a given value
   - [?oldprice_above=999](http://server.getoutfit.ru/offers?oldprice_above=999) Limit the offers to those whose old price is above a given value
   - [?oldprice_below=999](http://server.getoutfit.ru/offers?oldprice_below=999) Limit the offers to those whose old price is below a given value

@@ -2,40 +2,78 @@
 <html>
 <head>
 <meta charset="UTF-8" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+<script>
+window.onload = function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    document.getElementById('offerName').value = urlParams.get('offerName');
+    document.getElementById('offerName').focus();
+};
+</script>
+
 <style>
 
-ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
+/* Add a black background color to the top navigation bar */
+.topnav {
   overflow: hidden;
   background-color: #333;
-  position: -webkit-sticky; /* Safari */
-  position: sticky;
-  top: 0;
+  min-width: 700px;
 }
 
-li.title {
-    color: white;
-    text-align: center;
-    padding: 14px 16px;
-}
-
-li {
+/* Style the links inside the top navigation bar */
+.topnav a {
   float: left;
-}
-
-li a {
   display: block;
   color: white;
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
+  font-size: 17px;
 }
 
-li a:hover {
-  background-color: #111;
+.topnav li.title {
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+}
+
+.topnav li {
+  float: left;
+}
+
+.topnav ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  position: -webkit-sticky; /* Safari */
+  position: sticky;
+  top: 0;
+}
+
+/* Style the search box inside the navigation bar */
+.topnav .search-container {
+  float: right;
+}
+
+.topnav input[type=text] {
+  padding: 6px;
+  margin-top: 8px;
+  font-size: 17px;
+  border: none;
+}
+
+.topnav .search-container button {
+  float: right;
+  padding: 6px 10px;
+  margin-top: 8px;
+  margin-right: 16px;
+  background: #333;
+  color: white;
+  font-size: 17px;
+  border: none;
+  cursor: pointer;
 }
 
 div.gallery {
@@ -85,56 +123,73 @@ div.desc {
   display: table;
   clear: both;
 }
-</style>
 
+</style>
 <title>Get Outfit Server Images</title>
 </head>
 
 <body>
 
-<h2></h2>
-
 <div class="header">
   <h2>Get Outfit Server Image Gallery</h2>
 </div>
 
+<div class = "topnav">
+<ul>
+{% if first < last %}
+<li class="title">Images {{ first }}–{{ last }} of {{ total }}</li>
+{% elif first == last %}
+<li class="title">Image {{ first }} of {{ total }}</li>
+{% endif %}
+<div class="search-container">
+<form action="images" id="searchform">
+  <input type="text" id="offerName" placeholder="Search..." name="offerName">
+  <script>
+  offerName.oninput = function() {
+    document.forms["searchform"].submit();
+  };
+  </script>
+  <input type="hidden" name="format" value="html">
+  <button type="submit"><i class="fa fa-search"></i></button>
+</form>
+</div>
+</ul>
+</div> <!-- topnav -->
+
+<div class="topnav">
 <ul>
   {% if 0 < left5000 or 1 < first  %}
-  <li><a class="w3-indigo" href="?format=html&from={{ left5000 }}"><5000</a></li>
+  <li><a class="w3-indigo" href="?format=html&from={{ left5000 }}{{ urlParams }}"><5000</a></li>
   {% endif %}
   {% if 0 < left1000 or 1 < first  %}
-  <li><a class="w3-deep-purple" href="?format=html&from={{ left1000 }}"><1000</a></li>
+  <li><a class="w3-deep-purple" href="?format=html&from={{ left1000 }}{{ urlParams }}"><1000</a></li>
   {% endif %}
   {% if 0 < left500 or 1 < first  %}
-  <li><a class="w3-teal" href="?format=html&from={{ left500 }}"><500</a></li>
+  <li><a class="w3-teal" href="?format=html&from={{ left500 }}{{ urlParams }}"><500</a></li>
   {% endif %}
   {% if 0 < left100 or 1 < first  %}
-  <li><a class="w3-cyan" href="?format=html&from={{ left100 }}"><100</a></li>
+  <li><a class="w3-cyan" href="?format=html&from={{ left100 }}{{ urlParams }}"><100</a></li>
   {% endif %}
   {% if 0 < left or 1 < first %}
-  <li><a class="w3-aqua" href="?format=html&from={{ left }}"><</a></li>
-  {% endif %}
-  {% if first < last %}
-  <li class="title">Images {{ first }}–{{ last }} of {{ total }}</li>
-  {% elif first == last %}
-  <li class="title">Image {{ first }} of {{ total }}</li>
+  <li><a class="w3-aqua" href="?format=html&from={{ left }}{{ urlParams }}"><</a></li>
   {% endif %}
   {% if right5000 < total or last < total  %}
-  <li style="float:right"><a class="w3-indigo" href="?format=html&from={{ right5000 }}">5000></a></li>
+  <li style="float:right"><a class="w3-indigo" href="?format=html&from={{ right5000 }}{{ urlParams }}">5000></a></li>
   {% endif %}
   {% if right1000 < total or last < total  %}
-  <li style="float:right"><a class="w3-deep-purple" href="?format=html&from={{ right1000 }}">1000></a></li>
+  <li style="float:right"><a class="w3-deep-purple" href="?format=html&from={{ right1000 }}{{ urlParams }}">1000></a></li>
   {% endif %}
   {% if right500 < total or last < total  %}
-  <li style="float:right"><a class="w3-teal" href="?format=html&from={{ right500 }}">500></a></li>
+  <li style="float:right"><a class="w3-teal" href="?format=html&from={{ right500 }}{{ urlParams }}">500></a></li>
   {% endif %}
   {% if right100 < total or last < total  %}
-  <li style="float:right"><a class="w3-cyan" href="?format=html&from={{ right100 }}">100></a></li>
+  <li style="float:right"><a class="w3-cyan" href="?format=html&from={{ right100 }}{{ urlParams }}">100></a></li>
   {% endif %}
   {% if right < total or last < total %}
-  <li style="float:right"><a class="w3-aqua" href="?format=html&from={{ right }}">></a></li>
+  <li style="float:right"><a class="w3-aqua" href="?format=html&from={{ right }}{{ urlParams }}">></a></li>
   {% endif %}
 </ul>
+</div> <!-- topnav -->
 
 {% for image in images %}
 <div class="responsive">
