@@ -96,8 +96,8 @@ func setup(_ router: Router) {
   router.get("/images") { request, response, next in
     let requestStartTime = Date()
     var images = catalog.shop?.images ?? []
-    var urlParams = ""
-
+    var offerNames = [String]()
+    
     // MARK: "categoryId"
     if let categoryIds = request.queryParametersMultiValues["categoryId"]?.compactMap({ Int($0) }),
       !categoryIds.isEmpty
@@ -111,7 +111,9 @@ func setup(_ router: Router) {
     }
 
     // MARK: "offerId"
-    if let offerIds = request.queryParametersMultiValues["offerId"]?.map({ $0.lowercased() }),
+    if let offerIds = request.queryParametersMultiValues["offerId"]?.compactMap({
+      $0.isEmpty ? nil : $0.lowercased()
+    }),
       !offerIds.isEmpty
     {
       images = images.filter({
@@ -123,10 +125,11 @@ func setup(_ router: Router) {
     }
 
     // MARK: "offerName"
-    if let words = request.queryParametersMultiValues["offerName"]?.map({ $0.lowercased() }),
-      !words.isEmpty
+    if let phrases = request.queryParametersMultiValues["offerName"]?.compactMap({ $0.isEmpty ? nil : $0.lowercased() }),
+      !phrases.isEmpty
     {
-      urlParams += "&offerName=\(words.joined(separator: "&offerName="))"
+      let words = phrases.flatMap { $0.split(separator: " ") }.map { String($0) }
+      offerNames = words
 
       images = images.filter({
         if let offerName = $0.offerName?.lowercased() {
@@ -164,6 +167,7 @@ func setup(_ router: Router) {
       response.send(json: ["duration": duration])
     } else if request.queryParameters["count"] == nil {
       if isHtml {
+        let offerNameString = "&offerName=" + offerNames.joined(separator: "&offerName=")
         let context: [String: Codable] = [
           "images": images,
           "first": from + 1,
@@ -173,7 +177,8 @@ func setup(_ router: Router) {
           "left500": from - 500,
           "left100": from - 100,
           "left": from - 24,
-          "urlParams": urlParams,
+          "offerNameString": offerNameString,
+          "offerNames": offerNames,
           "right": from + 24,
           "right100": from + 100,
           "right500": from + 500,
@@ -233,7 +238,9 @@ func setup(_ router: Router) {
     }
 
     // MARK: "id"
-    if let ids = request.queryParametersMultiValues["id"]?.map({ $0.lowercased() }),
+    if let ids = request.queryParametersMultiValues["id"]?.compactMap({
+      $0.isEmpty ? nil : $0.lowercased()
+    }),
       !ids.isEmpty
     {
       offers = offers.filter({
@@ -325,7 +332,9 @@ func setup(_ router: Router) {
     }
 
     // MARK: "name"
-    if let words = request.queryParametersMultiValues["name"]?.map({ $0.lowercased() }),
+    if let words = request.queryParametersMultiValues["name"]?.compactMap({
+      $0.isEmpty ? nil : $0.lowercased()
+    }),
       !words.isEmpty
     {
       offers = offers.filter({

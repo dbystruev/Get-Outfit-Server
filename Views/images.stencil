@@ -10,6 +10,14 @@ window.onload = function() {
     const urlParams = new URLSearchParams(window.location.search);
     document.getElementById('offerName').value = urlParams.get('offerName');
     document.getElementById('offerName').focus();
+    let submitVar = setTimeout(submitFunc, 100000);
+    offerName.oninput = function() {
+      clearTimeout(submitVar);
+      submitVar = setTimeout(submitFunc, 1000);
+    };
+    function submitFunc() {
+      document.forms["searchform"].submit();
+    }
 };
 </script>
 
@@ -59,6 +67,7 @@ window.onload = function() {
 
 .topnav input[type=text] {
   padding: 6px;
+  margin-bottom: 8px;
   margin-top: 8px;
   font-size: 17px;
   border: none;
@@ -140,15 +149,12 @@ div.desc {
 <li class="title">Images {{ first }}–{{ last }} of {{ total }}</li>
 {% elif first == last %}
 <li class="title">Image {{ first }} of {{ total }}</li>
+{% else %}
+<li class="title">No matching items {% for offerName in offerNames %}{{ offerName }} {% endfor %}</li>
 {% endif %}
 <div class="search-container">
 <form action="images" id="searchform">
   <input type="text" id="offerName" placeholder="Search..." name="offerName">
-  <script>
-  offerName.oninput = function() {
-    document.forms["searchform"].submit();
-  };
-  </script>
   <input type="hidden" name="format" value="html">
   <button type="submit"><i class="fa fa-search"></i></button>
 </form>
@@ -159,34 +165,34 @@ div.desc {
 <div class="topnav">
 <ul>
   {% if 0 < left5000 or 1 < first  %}
-  <li><a class="w3-indigo" href="?format=html&from={{ left5000 }}{{ urlParams }}"><5000</a></li>
+  <li><a class="w3-indigo" href="?format=html&from={{ left5000 }}{{ offerNameString }}"><5000</a></li>
   {% endif %}
   {% if 0 < left1000 or 1 < first  %}
-  <li><a class="w3-deep-purple" href="?format=html&from={{ left1000 }}{{ urlParams }}"><1000</a></li>
+  <li><a class="w3-deep-purple" href="?format=html&from={{ left1000 }}{{ offerNameString }}"><1000</a></li>
   {% endif %}
   {% if 0 < left500 or 1 < first  %}
-  <li><a class="w3-teal" href="?format=html&from={{ left500 }}{{ urlParams }}"><500</a></li>
+  <li><a class="w3-teal" href="?format=html&from={{ left500 }}{{ offerNameString }}"><500</a></li>
   {% endif %}
   {% if 0 < left100 or 1 < first  %}
-  <li><a class="w3-cyan" href="?format=html&from={{ left100 }}{{ urlParams }}"><100</a></li>
+  <li><a class="w3-cyan" href="?format=html&from={{ left100 }}{{ offerNameString }}"><100</a></li>
   {% endif %}
   {% if 0 < left or 1 < first %}
-  <li><a class="w3-aqua" href="?format=html&from={{ left }}{{ urlParams }}"><</a></li>
+  <li><a class="w3-aqua" href="?format=html&from={{ left }}{{ offerNameString }}"><</a></li>
   {% endif %}
   {% if right5000 < total or last < total  %}
-  <li style="float:right"><a class="w3-indigo" href="?format=html&from={{ right5000 }}{{ urlParams }}">5000></a></li>
+  <li style="float:right"><a class="w3-indigo" href="?format=html&from={{ right5000 }}{{ offerNameString }}">5000></a></li>
   {% endif %}
   {% if right1000 < total or last < total  %}
-  <li style="float:right"><a class="w3-deep-purple" href="?format=html&from={{ right1000 }}{{ urlParams }}">1000></a></li>
+  <li style="float:right"><a class="w3-deep-purple" href="?format=html&from={{ right1000 }}{{ offerNameString }}">1000></a></li>
   {% endif %}
   {% if right500 < total or last < total  %}
-  <li style="float:right"><a class="w3-teal" href="?format=html&from={{ right500 }}{{ urlParams }}">500></a></li>
+  <li style="float:right"><a class="w3-teal" href="?format=html&from={{ right500 }}{{ offerNameString }}">500></a></li>
   {% endif %}
   {% if right100 < total or last < total  %}
-  <li style="float:right"><a class="w3-cyan" href="?format=html&from={{ right100 }}{{ urlParams }}">100></a></li>
+  <li style="float:right"><a class="w3-cyan" href="?format=html&from={{ right100 }}{{ offerNameString }}">100></a></li>
   {% endif %}
   {% if right < total or last < total %}
-  <li style="float:right"><a class="w3-aqua" href="?format=html&from={{ right }}{{ urlParams }}">></a></li>
+  <li style="float:right"><a class="w3-aqua" href="?format=html&from={{ right }}{{ offerNameString }}">></a></li>
   {% endif %}
 </ul>
 </div> <!-- topnav -->
