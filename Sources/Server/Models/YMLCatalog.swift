@@ -6,6 +6,7 @@
 //  See https://yandex.ru/support/partnermarket/export/yml.html
 
 import Foundation
+import LoggerAPI
 
 class YMLCatalog: Codable {
   var date: Date?
@@ -22,6 +23,7 @@ class YMLCatalog: Codable {
 
   func reloadImages() {
     shop?.reloadImages()
+    Log.info("\(shop?.offers.count ?? 0) offers and \(shop?.images.count ?? 0) images loaded")
   }
 }
 

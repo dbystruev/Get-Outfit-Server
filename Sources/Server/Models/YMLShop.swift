@@ -24,16 +24,13 @@ struct YMLShop: Codable {
         $0 == nil
           ? nil
           : Image(
-            url: $0!.absoluteString,
             offerId: offer.id ?? "No offer id",
             offerURL: offer.url?.absoluteString ?? "No offer URL",
-            offerName: offer.name ?? "No offer name"
+            offerName: offer.name ?? "No offer name",
+            url: $0!.absoluteString
           )
       })
     }).sorted { $0.offerName < $1.offerName }
-    #if DEBUG
-      Log.debug("\(images.count) images reloaded")
-    #endif
   }
 }
 

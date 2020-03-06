@@ -95,18 +95,18 @@ func setup(_ router: Router) {
 
     // MARK: "from"
     var from = request.queryParameters["from"]?.int ?? 0
+    from = min(images.count - 24, from)
     from = max(0, from)
-    from = min(images.count, from)
     images = Array(images[from...])
-
-    // MARK: "limit"
-    var limit = request.queryParameters["limit"]?.int ?? 24
-    limit = max(0, limit)
-    limit = min(images.count, limit)
-    images = Array(images[..<limit])
 
     // MARK: "format"
     let isHtml = request.queryParameters["format"]?.string.lowercased() == "html"
+
+    // MARK: "limit"
+    var limit = isHtml ? 24 : request.queryParameters["limit"]?.int ?? 24
+    limit = min(images.count, limit)
+    limit = max(0, limit)
+    images = Array(images[..<limit])
 
     // MARK: "duration"
     let isTiming = request.queryParameters["duration"] != nil
@@ -117,12 +117,19 @@ func setup(_ router: Router) {
     } else if request.queryParameters["count"] == nil {
       if isHtml {
         let context: [String: Codable] = [
-          "from": from,
           "images": images,
-          "limit": limit,
-          "next": from + limit,
-          "prev": max(0, from - limit),
-          "till": from + limit - 1,
+          "first": from + 1,
+          "last": from + limit,
+          "left5000": from - 5000,
+          "left1000": from - 1000,
+          "left500": from - 500,
+          "left100": from - 100,
+          "left": from - 24,
+          "right": from + 24,
+          "right100": from + 100,
+          "right500": from + 500,
+          "right1000": from + 1000,
+          "right5000": from + 5000,
           "total": total,
         ]
         try response.render("images", context: context)

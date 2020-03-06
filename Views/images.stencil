@@ -2,7 +2,9 @@
 <html>
 <head>
 <meta charset="UTF-8" />
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <style>
+
 ul {
   list-style-type: none;
   margin: 0;
@@ -34,10 +36,6 @@ li a {
 
 li a:hover {
   background-color: #111;
-}
-
-.active {
-  background-color: #4CAF50;
 }
 
 div.gallery {
@@ -101,9 +99,41 @@ div.desc {
 </div>
 
 <ul>
-  <li><a class="active" href="?format=html&from={{ prev }}&limit={{ limit }}"><</a></li>
-  <li class="title">{{ images.count }} images ({{ from }} — {{ till }}) of {{ total }}</li>
-  <li style="float:right"><a class="active" href="?format=html&from={{ next }}&limit={{ limit }}">></a></li>
+  {% if 0 < left5000 or 1 < first  %}
+  <li><a class="w3-indigo" href="?format=html&from={{ left5000 }}"><5000</a></li>
+  {% endif %}
+  {% if 0 < left1000 or 1 < first  %}
+  <li><a class="w3-deep-purple" href="?format=html&from={{ left1000 }}"><1000</a></li>
+  {% endif %}
+  {% if 0 < left500 or 1 < first  %}
+  <li><a class="w3-teal" href="?format=html&from={{ left500 }}"><500</a></li>
+  {% endif %}
+  {% if 0 < left100 or 1 < first  %}
+  <li><a class="w3-cyan" href="?format=html&from={{ left100 }}"><100</a></li>
+  {% endif %}
+  {% if 0 < left or 1 < first %}
+  <li><a class="w3-aqua" href="?format=html&from={{ left }}"><</a></li>
+  {% endif %}
+  {% if first < last %}
+  <li class="title">Images {{ first }}–{{ last }} of {{ total }}</li>
+  {% elif first == last %}
+  <li class="title">Image {{ first }} of {{ total }}</li>
+  {% endif %}
+  {% if right5000 < total or last < total  %}
+  <li style="float:right"><a class="w3-indigo" href="?format=html&from={{ right5000 }}">5000></a></li>
+  {% endif %}
+  {% if right1000 < total or last < total  %}
+  <li style="float:right"><a class="w3-deep-purple" href="?format=html&from={{ right1000 }}">1000></a></li>
+  {% endif %}
+  {% if right500 < total or last < total  %}
+  <li style="float:right"><a class="w3-teal" href="?format=html&from={{ right500 }}">500></a></li>
+  {% endif %}
+  {% if right100 < total or last < total  %}
+  <li style="float:right"><a class="w3-cyan" href="?format=html&from={{ right100 }}">100></a></li>
+  {% endif %}
+  {% if right < total or last < total %}
+  <li style="float:right"><a class="w3-aqua" href="?format=html&from={{ right }}">></a></li>
+  {% endif %}
 </ul>
 
 {% for image in images %}

@@ -8,8 +8,7 @@ Server for [Get Outfit](https://getoutfit.ru)
   git clone https://github.com/dbystruev/Get-Outfit-Server.git .
   apt update && apt -y upgrade
   apt -y install openssl libssl-dev libmysqlclient-dev libcurl4-openssl-dev vim
-  mv Sources/Server/Models/RemoteShop+Data+sample.swift Sources/Server/Models/RemoteShop+Data.swift
-  vi Sources/Server/Models/RemoteShop+Data.swift # fill with your Admitad data (see below)
+  vi Sources/Server/Models/RemoteShop+Data.swift # fill with your real Admitad data (see below)
   exit
   ```
 
