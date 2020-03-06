@@ -4,6 +4,6 @@
 /Packages
 /*.xcodeproj
 /Package.resolved
-/Sources/Server/Models/Shop+Data.swift
+/Sources/Server/Models/RemoteShop+Data*.swift
 nohup.out
 .vscode

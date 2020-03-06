@@ -116,9 +116,8 @@ class XMLManager: NSObject {
     }
     
     var localURL: URL? {
-        let urls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
         guard let localPath = localPath else { return nil }
-        return urls.first?.appendingPathComponent(localPath)
+        return getWorkingDirectory().appendingPathComponent(localPath)
     }
     
     // MARK: - Methods

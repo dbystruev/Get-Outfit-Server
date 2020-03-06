@@ -11,9 +11,9 @@ import LoggerAPI
 import SwiftRedis
 
 #if DEBUG
-HeliumLogger.use(.debug)
+  HeliumLogger.use(.debug)
 #else
-HeliumLogger.use(.info)
+  HeliumLogger.use(.info)
 #endif
 
 let catalog = YMLCatalog()
@@ -21,26 +21,11 @@ let redis = Redis()
 let router = Router()
 let xmlManager = XMLManager()
 
-setup { loadedCatalog, error in
-    if let error = error {
-        Log.error(error.localizedDescription)
-    }
-    
-    if let loadedCatalog = loadedCatalog {
-        catalog.date = loadedCatalog.date
-        catalog.shop = loadedCatalog.shop
-    } else {
-        Log.error("Loading empty shop")
-        catalog.date = Date(timeIntervalSince1970: 0)
-        catalog.shop = YMLShop.emptyShop
-    }
-    
-    catalog.reloadImages()
-    
-    // setup(redis)
-    setupCORS(router)
-    setup(router)
-}
+setupCatalog()
+
+// setup(redis)
+setupCORS(router)
+setup(router)
 
 Kitura.addHTTPServer(onPort: 8888, with: router)
 Kitura.run()

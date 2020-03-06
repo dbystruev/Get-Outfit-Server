@@ -5,7 +5,6 @@ Server for [Get Outfit](https://getoutfit.ru)
 * Install Get Outfit Server on development server
   ```bash
   docker run -p80:8888 -it --name GetOutfit -w/GetOutfit swift bash
-  mkdir -p $HOME/Documents/XML
   git clone https://github.com/dbystruev/Get-Outfit-Server.git .
   apt update && apt -y upgrade
   apt -y install openssl libssl-dev libmysqlclient-dev libcurl4-openssl-dev vim
@@ -31,8 +30,6 @@ Server for [Get Outfit](https://getoutfit.ru)
     docker run --name GetOutfit_build -p8888:8888 -d -w/GetOutfit getoutfit_build swift run -c release
     docker logs -f GetOutfit_build
     # after the server has been compiled & started press Ctrl-C on Linux or Cmd-. on macOS
-    curl localhost:8888/update
-    docker exec GetOutfit_build mv /root/Documents/XML/update.xml /root/Documents/XML/full.xml
     docker stop GetOutfit_build
     
     ```

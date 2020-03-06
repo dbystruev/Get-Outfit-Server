@@ -9,121 +9,112 @@ import Kitura
 import KituraStencil
 import LoggerAPI
 
-// MARK: - Load Catalog Locally
-func loadCatalog(completion: @escaping (YMLCatalog?, Error?) -> Void) {
-    let decoder = PropertyListDecoder()
-    
-    // MARK: Try to load from UserDefaults
-    if
-        let savedData = UserDefaults.standard.data(forKey: "\(YMLCatalog.self)"),
-        let catalog = try? decoder.decode(YMLCatalog.self, from: savedData)
-    {
-        #if DEBUG
-        Log.debug("Found saved catalog \(catalog) in UserDefaults")
-        #endif
-        
-        completion(catalog, nil)
-        return
+// MARK: - Get Default Document Directory
+func getWorkingDirectory() -> URL {
+  let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+  let workingDirectory = documentDirectory.appendingPathComponent("get_outfit_server")
+  var isDirectory = ObjCBool(true)
+  let fileExists = FileManager.default.fileExists(
+    atPath: workingDirectory.path, isDirectory: &isDirectory)
+  guard fileExists && isDirectory.boolValue else {
+    do {
+      try FileManager.default.createDirectory(at: workingDirectory, withIntermediateDirectories: true)
+      return workingDirectory
+    } catch let error {
+      Log.error(
+        "ERROR: Can't create directory at \(workingDirectory.path) due to \(error.localizedDescription)"
+      )
+      return documentDirectory
     }
+  }
+  return workingDirectory
+}
+
+// MARK: - Try to load catalog locally
+func getLocalCatalog() -> YMLCatalog? {
+  let filename = getWorkingDirectory().appendingPathComponent("catalog.json")
+
+  do {
+    let savedData = try Data(contentsOf: filename)
+    let catalog = try JSONDecoder().decode(YMLCatalog.self, from: savedData)
+    catalog.reloadImages()
 
     #if DEBUG
-    Log.debug("No saved UserDefaults data for \(YMLCatalog.self)")
+      Log.debug("Found saved catalog \(catalog) in \(filename)")
     #endif
-    
-    // MARK: Try to load into XML file/parse it
-    xmlManager.loadAndParseLocally(using: "XML/full.xml") { catalog, error in
-        if let error = error {
-            completion(nil, error)
-            return
-        }
-        
-        guard let catalog = catalog else {
-            completion(nil, XMLManager.Errors.emptyCatalog)
-            return
-        }
-        
-        #if DEBUG
-        Log.debug("Parsed XML catalog \(catalog)")
-        #endif
-        
-        save(catalog)
-        completion(catalog, nil)
-    }
+
+    return catalog
+
+  } catch let error {
+    #if DEBUG
+      Log.debug("ERROR reading catalog data from \(filename): \(error.localizedDescription)")
+    #endif
+  }
+
+  return nil
 }
 
 // MARK: - Save Catalog Locally
 func save(_ catalog: YMLCatalog) {
-    let encoder = PropertyListEncoder()
-    guard let encodedCatalog = try? encoder.encode(catalog) else {
-        Log.error("Can't encode \(catalog)")
-        return
-    }
-    
-    #if DEBUG
-    Log.debug("Saving catalog \(catalog) to UserDefaults")
-    #endif
-    
-    UserDefaults.standard.set(encodedCatalog, forKey: "\(YMLCatalog.self)")
+  defer {
+    catalog.reloadImages()
+  }
+  catalog.clearImages()
+
+  guard let encodedCatalog = try? JSONEncoder().encode(catalog) else {
+    Log.error("Can't encode \(catalog)")
+    return
+  }
+
+  let filename = getWorkingDirectory().appendingPathComponent("catalog.json")
+
+  #if DEBUG
+    Log.debug("Saving catalog \(catalog) to \(filename)")
+  #endif
+
+  do {
+    try encodedCatalog.write(to: filename, options: .atomic)
+  } catch let error {
+    Log.error("ERROR writing catalog \(catalog) to \(filename): \(error.localizedDescription)")
+  }
 }
 
 // MARK: - Setup Catalog
-func setup(completion: @escaping (YMLCatalog?, Error?) -> Void) {
-    loadCatalog { catalog, error in
-        guard let catalog = catalog, error == nil else {
-            completion(nil, error)
-            return
-        }
-        
-        #if DEBUG
-        Log.debug("Loaded catalog locally \(catalog)")
-        #endif
-        
-        let yesterday = Date().addingTimeInterval(-86400)
-        
-        guard let catalogDate = catalog.date, catalogDate < yesterday else {
-            completion(catalog, nil)
-            return
-        }
-        
-        xmlManager.lastImport = catalogDate
-        updateCatalogLocally { updatedCatalog, error in
-            if let error = error { Log.error(error.localizedDescription) }
-            if let updatedCatalog = updatedCatalog { catalog.update(with: updatedCatalog) }
-            #if DEBUG
-            Log.debug(
-                "Updated catalog locally \(catalog)"
-            )
-            #endif
-            
-            guard let updatedCatalogDate = catalog.date, updatedCatalogDate < yesterday else {
-                save(catalog)
-                completion(catalog, nil)
-                return
-            }
-            
-            xmlManager.lastImport = updatedCatalogDate
-            updateCatalogFromRemote { remoteCatalog, error in
-                if let error = error { Log.error(error.localizedDescription) }
-                if let remoteCatalog = remoteCatalog { catalog.update(with: remoteCatalog) }
-                #if DEBUG
-                Log.debug(
-                    "Updated catalog from remote \(catalog)"
-                )
-                #endif
-                
-                save(catalog)
-                completion(catalog, nil)
-            }
-        }
-    }
+func setupCatalog() {
+  // Try to load catalog from local file
+  if let localCatalog = getLocalCatalog() {
+    catalog.date = localCatalog.date
+    catalog.shop = localCatalog.shop
+  }
+
+  // Try to download XML file and parse it
+  updateCatalog()
 }
 
-// MARK: - Update Catalog Locally
-func updateCatalogLocally(completion: @escaping (YMLCatalog?, Error?) -> Void) {
-    xmlManager.loadAndParseLocally(using: "XML/update.xml", completion: completion)
+// MARK: - Update Catalog if needed
+func updateCatalog() {
+  let yesterday = Date().addingTimeInterval(-86400)
+
+  guard let updatedCatalogDate = catalog.date, updatedCatalogDate < yesterday else { return }
+
+  xmlManager.lastImport = updatedCatalogDate
+
+  updateCatalogFromRemote { remoteCatalog, error in
+    if let error = error { Log.error(error.localizedDescription) }
+    if let remoteCatalog = remoteCatalog { catalog.update(with: remoteCatalog) }
+    #if DEBUG
+      Log.debug("Updated catalog \(catalog) from remote \(catalog)")
+    #endif
+    save(catalog)
+  }
 }
 
 // MARK: - Update Catalog from Remote
 func updateCatalogFromRemote(completion: @escaping (YMLCatalog?, Error?) -> Void) {
-    xmlManager.loadAndParseFromRemote(using: "XML/update.xml", completion: completion)
+  xmlManager.loadAndParseFromRemote(using: "update.xml", completion: completion)
+}
+
+// MARK: - Update Catalog Locally
+func updateCatalogLocally(completion: @escaping (YMLCatalog?, Error?) -> Void) {
+  xmlManager.loadAndParseLocally(using: "update.xml", completion: completion)
 }

@@ -8,72 +8,80 @@
 import Foundation
 
 class YMLCatalog: Codable {
-    var date: Date?
-    var shop: YMLShop?
-    
-    func reloadImages() {
-        shop?.reloadImages()
-    }
+  var date: Date?
+  var shop: YMLShop?
+
+  init() {
+    date = Date(timeIntervalSince1970: 0)
+    shop = nil
+  }
+
+  func clearImages() {
+    shop?.images = []
+  }
+
+  func reloadImages() {
+    shop?.reloadImages()
+  }
 }
 
 // MARK: - XMLElement
 extension YMLCatalog: XMLElement {
-    var attributes: [String : String] {
-        get {
-            guard let date = date else { return [:] }
-            return ["date": date.toString]
-        }
-        set {
-            guard let dateString = newValue["date"] else { return }
-            self.date = dateString.toDate
-        }
+  var attributes: [String: String] {
+    get {
+      guard let date = date else { return [:] }
+      return ["date": date.toString]
     }
-    
-    var children: [XMLElement] {
-        if let shop = shop {
-            return [shop]
+    set {
+      guard let dateString = newValue["date"] else { return }
+      self.date = dateString.toDate
+    }
+  }
+
+  var children: [XMLElement] {
+    if let shop = shop {
+      return [shop]
+    } else {
+      return []
+    }
+  }
+
+  var elementName: String {
+    return "yml_catalog"
+  }
+
+  func addChild(_ child: XMLElement) {
+    if let shop = child as? YMLShop {
+      self.shop = shop
+    }
+  }
+
+  func update(with element: XMLElement) {
+    if let catalog = element as? Self {
+      date = catalog.date ?? date
+      if let updatedShop = catalog.shop {
+        if shop == nil {
+          shop = updatedShop
         } else {
-            return []
+          shop?.update(with: updatedShop)
         }
+      }
     }
-    
-    var elementName: String {
-        return "yml_catalog"
-    }
-    
-    func addChild(_ child: XMLElement) {
-        if let shop = child as? YMLShop {
-            self.shop = shop
-        }
-    }
-    
-    func update(with element: XMLElement) {
-        if let catalog = element as? Self {
-            date = catalog.date ?? date
-            if let updatedShop = catalog.shop {
-                if shop == nil {
-                    shop = updatedShop
-                } else {
-                    shop?.update(with: updatedShop)
-                }
-                reloadImages()
-            }
-        }
-    }
+  }
 }
 
 extension YMLCatalog {
-    convenience init(attributes: [String : String]) {
-        self.init()
-        self.attributes = attributes
-    }
+  convenience init(attributes: [String: String]) {
+    self.init()
+    self.attributes = attributes
+  }
 }
 
 #if DEBUG
-// MARK: - CustomStringConvertible
-extension YMLCatalog: CustomStringConvertible {
+  // MARK: - CustomStringConvertible
+  extension YMLCatalog: CustomStringConvertible {
     var description: String {
-        return "\(date?.toString ?? "nil"), offers: \(shop?.offers.count ?? 0)"
+      return "\(date?.toString ?? "nil"), offers: \(shop?.offers.count ?? 0)"
     }
-}
+  }
 #endif
