@@ -74,8 +74,6 @@ class XMLManager: NSObject {
     var processedElements = [XMLElement]()
     var rootElement: XMLElement?
 
-    let remoteShop = RemoteShop.all[0] // 0 – Lamoda, 1 — Farfetch
-
     lazy var remotePath = remoteShop.path
     
     // Get remote parameters from Admitad

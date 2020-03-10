@@ -18,6 +18,7 @@ import SwiftRedis
 
 let catalog = YMLCatalog()
 let redis = Redis()
+let remoteShop = RemoteShop.all[1] // 0 – Lamoda, 1 — Farfetch
 let router = Router()
 let xmlManager = XMLManager()
 

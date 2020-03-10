@@ -9,6 +9,42 @@ import Kitura
 import KituraStencil
 import LoggerAPI
 
+// MARK: - Try to load catalog locally
+func getLocalCatalog() -> YMLCatalog? {
+  let jsonURL = getLocalPermanentStorageURL()
+
+  do {
+    let savedData = try Data(contentsOf: jsonURL)
+    let catalog = try JSONDecoder().decode(YMLCatalog.self, from: savedData)
+    catalog.reloadImages()
+
+    #if DEBUG
+      Log.debug("Found saved catalog \(catalog) in \(jsonURL)")
+    #endif
+
+    return catalog
+
+  } catch let error {
+    #if DEBUG
+      Log.debug("ERROR reading catalog data from \(jsonURL): \(error.localizedDescription)")
+    #endif
+  }
+
+  return nil
+}
+
+// MARK: - Get the URL of local permanent storage file
+func getLocalPermanentStorageURL() -> URL {
+  let jsonName = "\(remoteShop.name).json"
+  let jsonURL = getWorkingDirectory().appendingPathComponent(jsonName)
+  return jsonURL
+}
+
+func getLocalUpdateFilePath() -> String {
+  let updatePath = "\(remoteShop.name)_update.xml"
+  return updatePath
+}
+
 // MARK: - Get Default Document Directory
 func getWorkingDirectory() -> URL {
   let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -18,7 +54,8 @@ func getWorkingDirectory() -> URL {
     atPath: workingDirectory.path, isDirectory: &isDirectory)
   guard fileExists && isDirectory.boolValue else {
     do {
-      try FileManager.default.createDirectory(at: workingDirectory, withIntermediateDirectories: true)
+      try FileManager.default.createDirectory(
+        at: workingDirectory, withIntermediateDirectories: true)
       return workingDirectory
     } catch let error {
       Log.error(
@@ -28,30 +65,6 @@ func getWorkingDirectory() -> URL {
     }
   }
   return workingDirectory
-}
-
-// MARK: - Try to load catalog locally
-func getLocalCatalog() -> YMLCatalog? {
-  let filename = getWorkingDirectory().appendingPathComponent("catalog.json")
-
-  do {
-    let savedData = try Data(contentsOf: filename)
-    let catalog = try JSONDecoder().decode(YMLCatalog.self, from: savedData)
-    catalog.reloadImages()
-
-    #if DEBUG
-      Log.debug("Found saved catalog \(catalog) in \(filename)")
-    #endif
-
-    return catalog
-
-  } catch let error {
-    #if DEBUG
-      Log.debug("ERROR reading catalog data from \(filename): \(error.localizedDescription)")
-    #endif
-  }
-
-  return nil
 }
 
 // MARK: - Save Catalog Locally
@@ -66,16 +79,16 @@ func save(_ catalog: YMLCatalog) {
     return
   }
 
-  let filename = getWorkingDirectory().appendingPathComponent("catalog.json")
+  let jsonURL = getLocalPermanentStorageURL()
 
   #if DEBUG
-    Log.debug("Saving catalog \(catalog) to \(filename)")
+    Log.debug("Saving catalog \(catalog) to \(jsonURL)")
   #endif
 
   do {
-    try encodedCatalog.write(to: filename, options: .atomic)
+    try encodedCatalog.write(to: jsonURL, options: .atomic)
   } catch let error {
-    Log.error("ERROR writing catalog \(catalog) to \(filename): \(error.localizedDescription)")
+    Log.error("ERROR writing catalog \(catalog) to \(jsonURL): \(error.localizedDescription)")
   }
 }
 
@@ -111,10 +124,12 @@ func updateCatalog() {
 
 // MARK: - Update Catalog from Remote
 func updateCatalogFromRemote(completion: @escaping (YMLCatalog?, Error?) -> Void) {
-  xmlManager.loadAndParseFromRemote(using: "update.xml", completion: completion)
+  let localUpdatePath = getLocalUpdateFilePath()
+  xmlManager.loadAndParseFromRemote(using: localUpdatePath, completion: completion)
 }
 
 // MARK: - Update Catalog Locally
 func updateCatalogLocally(completion: @escaping (YMLCatalog?, Error?) -> Void) {
-  xmlManager.loadAndParseLocally(using: "update.xml", completion: completion)
+  let localUpdatePath = getLocalUpdateFilePath()
+  xmlManager.loadAndParseLocally(using: localUpdatePath, completion: completion)
 }
