@@ -159,6 +159,14 @@ func setup(_ router: Router) {
     limit = max(0, limit)
     images = Array(images[..<limit])
 
+    // MARK: "subid"
+    let subid = request.queryParameters["subid"]
+    if let nonOptionalSubid = subid {
+      for index in 0 ..< images.count {
+        images[index].setSubid(nonOptionalSubid)
+      }
+    }
+
     // MARK: "duration"
     let isTiming = request.queryParameters["duration"] != nil
 
@@ -184,6 +192,7 @@ func setup(_ router: Router) {
           "right500": from + 500,
           "right1000": from + 1000,
           "right5000": from + 5000,
+          "subid": subid,
           "total": total,
         ]
         try response.render("images", context: context)
@@ -548,14 +557,24 @@ func setup(_ router: Router) {
 
   // MARK: - GET /stylist
   router.get("/stylist") { request, response, next in
+    var context: [String: String] = [:]
+
     guard let subid = request.queryParameters["subid"] else {
       try response.status(.badRequest).end()
       return
     }
 
+    context["subid"] = subid
+    
+    if let url = request.queryParameters["url"] {
+      let prefix = "https://modato.ru/g/3f2779c2d4f6f0a2c5434e8640d77b/?ulp="
+      context["delim"] = "&"
+      context["url"] = "\(prefix)\(url)"
+    }
+
     Log.info("Generated links for subid: \(subid)")
 
-    try response.render("stylist", context: ["subid": subid])
+    try response.render("stylist", context: context)
 
     next()
   }
