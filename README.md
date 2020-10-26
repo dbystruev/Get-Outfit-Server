@@ -147,15 +147,11 @@ Categories and offers can be filtered by a combination of parameters.
 Stylist should be given a subid parameter.
 
 ### Installing HTML Routes
-
-* download Admitad Excel file
-
-* copy shop names to [Views/names.txt](https://github.com/dbystruev/Get-Outfit-Server/blob/master/Views/names.txt)
-
-* copy affiliate links to [Views/links.txt](https://github.com/dbystruev/Get-Outfit-Server/blob/master/Views/links.txt)
+- download Admitad Excel file
+- copy shop names to [Views/names.txt](https://github.com/dbystruev/Get-Outfit-Server/blob/master/Views/names.txt)
+- copy affiliate links to [Views/links.txt](https://github.com/dbystruev/Get-Outfit-Server/blob/master/Views/links.txt)
   - number of lines in names.txt and links.txt should be equal
-
-* create [Views/stylist.stencil](https://github.com/dbystruev/Get-Outfit-Server/blob/master/Views/stylist.stencil)
+- create [Views/stylist.stencil](https://github.com/dbystruev/Get-Outfit-Server/blob/master/Views/stylist.stencil)
 ```bash
 cd Views
 ./makelinks.sh names.txt links.txt > full_links.txt
