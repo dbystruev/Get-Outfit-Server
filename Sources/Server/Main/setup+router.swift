@@ -456,8 +456,22 @@ func setup(_ router: Router) {
     }
 
     // MARK: "vendor"
-    if let vendor = request.queryParameters["vendor"] {
-      offers = offers.filter { $0.vendor?.lowercased().contains(vendor.lowercased()) == true }
+    // if let vendor = request.queryParameters["vendor"] {
+    //   offers = offers.filter { $0.vendor?.lowercased().contains(vendor.lowercased()) == true }
+    // }
+
+    // MARK: "vendors"
+    if let vendors = request.queryParametersMultiValues["vendor"]?.compactMap({
+      $0.isEmpty ? nil : $0.lowercased()
+    }),
+      !vendors.isEmpty
+    {
+      offers = offers.filter({ offer in
+        if let vendor = offer.vendor?.lowercased() {
+          return vendors.first(where: { vendor.contains($0) }) != nil
+        }
+        return false
+      })
     }
 
     // MARK: "vendorCode"
