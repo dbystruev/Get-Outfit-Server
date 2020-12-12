@@ -226,6 +226,7 @@ func setup(_ router: Router) {
   }
 
   // MARK: - GET /offers
+  router.get("/offers", middleware: CacheMiddlewareGet())
   router.get("/offers") { request, response, next in
     let requestStartTime = Date()
 
@@ -512,6 +513,7 @@ func setup(_ router: Router) {
 
     next()
   }
+  router.get("/offers", middleware: CacheMiddlewareSet())
 
   // MARK: - GET /params
   router.get("/params") { request, response, next in

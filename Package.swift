@@ -12,6 +12,7 @@ let package = Package(
         .package(url: "https://github.com/IBM-Swift/Kitura-StencilTemplateEngine.git", .upToNextMajor(from: "1.11.1")),
         .package(url: "https://github.com/IBM-Swift/swift-html-entities.git", .upToNextMajor(from: "3.0.13")),
         .package(url: "https://github.com/IBM-Swift/Kitura-CORS.git", from: "2.1.1"),
+        .package(url: "https://github.com/Kitura/Kitura-Cache.git", from: "2.0.2"),
         .package(url: "https://github.com/apple/swift-format.git", .branch("swift-5.1-branch")),
     ],
     targets: [
@@ -21,6 +22,7 @@ let package = Package(
                 "HeliumLogger",
                 "HTMLEntities",
                 "Kitura",
+                "KituraCache",
                 "KituraCORS",
                 "KituraStencil",
                 "SwiftRedis",

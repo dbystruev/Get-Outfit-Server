@@ -38,6 +38,15 @@
         }
       },
       {
+        "package": "KituraCache",
+        "repositoryURL": "https://github.com/Kitura/Kitura-Cache.git",
+        "state": {
+          "branch": null,
+          "revision": "3c5441c9f017b50d1944b74c89f389421d26d116",
+          "version": "2.0.200"
+        }
+      },
+      {
         "package": "KituraCORS",
         "repositoryURL": "https://github.com/IBM-Swift/Kitura-CORS.git",
         "state": {

@@ -7,6 +7,7 @@
 import Foundation
 import HeliumLogger
 import Kitura
+import KituraCache
 import LoggerAPI
 import SwiftRedis
 
@@ -17,13 +18,14 @@ import SwiftRedis
 #endif
 
 let catalog = YMLCatalog()
+let cache = KituraCache()
 let redis = Redis()
 let remoteShop = RemoteShop.all[1] // 0 – Lamoda, 1 — Farfetch
 let router = Router()
 let xmlManager = XMLManager()
 
 setupCatalog()
-
+setup(cache, for: router)
 setup(redis)
 setupCORS(router)
 setup(router)
