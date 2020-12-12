@@ -14,7 +14,7 @@ class CacheMiddlewareSet: RouterMiddleware {
     public func handle(request: RouterRequest, response: RouterResponse, next: @escaping () -> Void) throws {
         cache.setObject(response, forKey: request.parameters)
         #if DEBUG
-        Log.debug("Object for \(request) is set: \(response)")
+        Log.debug("Object for \(request.parameters) is set")
         #endif
         next()
     }
