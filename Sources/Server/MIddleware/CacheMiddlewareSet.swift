@@ -12,9 +12,9 @@ import LoggerAPI
 class CacheMiddlewareSet: RouterMiddleware {
     /// Check that request is present in cache and return it if it has
     public func handle(request: RouterRequest, response: RouterResponse, next: @escaping () -> Void) throws {
-        cache.setObject(response, forKey: request.urlURL)
+        cache.setObject(response, forKey: request.queryParametersMultiValues)
         #if DEBUG
-        Log.debug("Object for \(request.urlURL) is set")
+        Log.debug("Object for \(request.queryParametersMultiValues) is set")
         #endif
         next()
     }

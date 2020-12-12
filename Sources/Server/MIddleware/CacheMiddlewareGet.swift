@@ -12,13 +12,13 @@ import LoggerAPI
 class CacheMiddlewareGet: RouterMiddleware {
     /// Check that request is present in cache and return it if it has
     public func handle(request: RouterRequest, response: RouterResponse, next: @escaping () -> Void) throws {
-        if let response = cache.object(forKey: request.urlURL) as? RouterResponse {
+        if let response = cache.object(forKey: request.queryParametersMultiValues) as? RouterResponse {
             #if DEBUG
-            Log.debug("Object for \(request.urlURL) is found in cache: \(response)")
+            Log.debug("Object for \(request.queryParametersMultiValues) is found in cache: \(response)")
             #endif
         } else {
             #if DEBUG
-            Log.debug("Object for \(request.urlURL) is NOT found in cache")
+            Log.debug("Object for \(request.queryParametersMultiValues) is NOT found in cache")
             #endif
         }
         next()
