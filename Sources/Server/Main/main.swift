@@ -24,7 +24,7 @@ let xmlManager = XMLManager()
 
 setupCatalog()
 
-// setup(redis)
+setup(redis)
 setupCORS(router)
 setup(router)
 setupStatic(router)

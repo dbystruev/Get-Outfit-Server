@@ -550,8 +550,8 @@ func setup(_ router: Router) {
 
     next()
   }
-
-  // MARK: "/prices"
+    
+  // MARK: - GET /prices
   router.get("/prices") { request, response, next in
     let offers = catalog.shop?.offers
 

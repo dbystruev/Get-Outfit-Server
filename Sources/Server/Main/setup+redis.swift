@@ -10,7 +10,7 @@ import SwiftRedis
 
 // MARK: - Setup Redis
 func setup(_ redis: Redis) {
-    let host = "localhost"
+    let host = "redis" // "localhost"
     let port = Int32(6379)
     
     redis.connect(host: host, port: port) { error in
