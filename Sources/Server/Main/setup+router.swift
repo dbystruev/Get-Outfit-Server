@@ -92,6 +92,15 @@ func setup(_ router: Router) {
         next()
     }
     
+    // MARK: - GET /flushdb
+    router.get("flushdb") { request, response, next in
+        if let id = request.queryParameters["id"], id == "flushredisdb" {
+            RedisManager.flushdb()
+            response.send(json: ["flushdate": Date().toString])
+        }
+        next()
+    }
+    
     // MARK: - GET /images
     router.get("/images") { request, response, next in
         let requestStartTime = Date()
