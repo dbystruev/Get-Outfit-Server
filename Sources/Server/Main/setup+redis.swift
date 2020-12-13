@@ -6,21 +6,17 @@
 
 import Kitura
 import LoggerAPI
-import SwiftRedis
 
 // MARK: - Setup Redis
-func setup(_ redis: Redis) {
-    let host = "redis" // "localhost"
-    let port = Int32(6379)
-    
-    redis.connect(host: host, port: port) { error in
+func setupRedis() {
+    RedisManager.connect { error in
         if let error = error {
-            Log.error("\(error.localizedDescription) at \(host):\(port)")
+            Log.error("\(error.localizedDescription) at \(RedisManager.host):\(RedisManager.port)")
             return
         }
         
         #if DEBUG
-        Log.debug("Connected to Redis at \(host):\(port)")
+        Log.debug("Connected to Redis at \(RedisManager.host):\(RedisManager.port)")
         #endif
     }
 }
