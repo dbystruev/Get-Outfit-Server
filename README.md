@@ -2,6 +2,8 @@
 
 Server for [Get Outfit](https://getoutfit.ru)
 
+iOS client: [github.com/dbystruev/Outfit-Selection](https://github.com/dbystruev/Outfit-Selection)
+
 * Install Get Outfit Server on development server
   ```bash
   docker run -p80:8888 -it --name GetOutfit -w/GetOutfit swift bash

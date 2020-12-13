@@ -226,7 +226,7 @@ func setup(_ router: Router) {
     }
     
     // MARK: - GET /offers
-    router.get("/offers", middleware: RedisManager.get)
+    router.get("/offers", middleware: RedisManager.middleware)
     router.get("/offers") { request, response, next in
         let requestStartTime = Date()
         
@@ -508,12 +508,14 @@ func setup(_ router: Router) {
             // MARK: "count"
             response.send(json: ["count": offers.count])
         } else {
-            response.send(json: offers)
+            response.send(offers)
+            if let data = try? JSONEncoder().encode(offers), let jsonString = String(data: data, encoding: .utf8) {
+                RedisManager.set(request: request, value: jsonString)
+            }
         }
         
         next()
     }
-    router.get("/offers", middleware: RedisManager.set)
     
     // MARK: - GET /params
     router.get("/params") { request, response, next in

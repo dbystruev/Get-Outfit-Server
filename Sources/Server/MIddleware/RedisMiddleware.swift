@@ -11,15 +11,13 @@ import SwiftRedis
 
 class RedisMiddleware: RouterMiddleware {
     // MARK: - Properties
-    let callback: (_ request: RouterRequest, _ response: RouterResponse, _ next: @escaping () -> Void) throws -> ()
     let host: String
     let port: Int32
     
     // MARK: - Init
-    init(host: String, port: Int32, get: Bool) {
+    init(host: String, port: Int32) {
         self.host = host
         self.port = port
-        callback = get ? RedisMiddleware.handleGet : RedisMiddleware.handleSet
     }
     
     // MARK: - Static Methods
@@ -39,15 +37,16 @@ class RedisMiddleware: RouterMiddleware {
         return key
     }
     
-    static func handleGet(request: RouterRequest, response: RouterResponse, next: @escaping () -> Void) throws {
+    static func handle(request: RouterRequest, response: RouterResponse, next: @escaping () -> Void) throws {
         let key = getKey(for: request)
         RedisManager.redis.get(key) { value, error in
-            guard let value = value else {
+            guard let value = value?.asString else {
                 if let error = error {
-                    Log.error("Can't connect to redis: \(error)")
+                    Log.error("Redis error: \(error)")
                     next()
                     return
                 }
+                
                 #if DEBUG
                 Log.debug("Value for \(key) is NOT found in cache")
                 #endif
@@ -58,30 +57,36 @@ class RedisMiddleware: RouterMiddleware {
             #if DEBUG
             Log.debug("Value for \(key) is found in cache: \(value)")
             #endif
-            next()
+            
+            do {
+                try response.send(value).end()
+            } catch {
+                next()
+            }
         }
     }
     
-    static func handleSet(request: RouterRequest, response: RouterResponse, next: @escaping () -> Void) throws {
+    /// Set redis value for key defined by router request
+    /// - Parameters:
+    ///   - request: router request to define the key
+    ///   - value: value to set
+    static func set(request: RouterRequest, value: String) {
         let key = getKey(for: request)
-        let value = response.userInfo.description
         RedisManager.redis.set(key, value: value) { success, error in
             guard success else {
                 let message = error?.localizedDescription ?? "host \(RedisManager.host), port \(RedisManager.port)"
-                Log.error("Can't connect to redis: \(message)")
-                next()
+                Log.error("Redis error: \(message)")
                 return
             }
+            
             #if DEBUG
             Log.debug("Value \(value) for \(key) is set")
             #endif
-            next()
         }
     }
     
     // MARK: - RouterMiddleware
-    /// Check that request is present in cache and return it if it has
-    public func handle(request: RouterRequest, response: RouterResponse, next: @escaping () -> Void) throws {
-        try self.callback(request, response, next)
+    func handle(request: RouterRequest, response: RouterResponse, next: @escaping () -> Void) throws {
+        try RedisMiddleware.handle(request: request, response: response, next: next)
     }
 }
