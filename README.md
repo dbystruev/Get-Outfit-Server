@@ -4,7 +4,7 @@ Server for [Get Outfit](https://getoutfit.ru)
 
 iOS client: [github.com/dbystruev/Outfit-Selection](https://github.com/dbystruev/Outfit-Selection)
 
-* Install Get Outfit Server on development server
+* Install Get Outfit Server as docker image
   ```bash
   docker run -p80:8888 -it --name GetOutfit -w/GetOutfit swift bash
   git clone https://github.com/dbystruev/Get-Outfit-Server.git .
@@ -12,40 +12,24 @@ iOS client: [github.com/dbystruev/Outfit-Selection](https://github.com/dbystruev
   apt -y install openssl libssl-dev libmysqlclient-dev libcurl4-openssl-dev vim
   vi Sources/Server/Models/RemoteShop+Data.swift # fill with your real Admitad data (see below)
   exit
+  docker commit GetOutfit getoutfit
+  docker rm GetOutfit
   ```
 
-* Create build image on development server, save it and copy to production server
-    ```bash
-    docker commit GetOutfit getoutfit_build
-    docker rm GetOutfit
-    docker image save -o getoutfit.tar getoutfit_build
-    docker rmi getoutfit_build
-    scp getoutfit.tar production-server:\~/
-    rm getoutfit.tar
-    ```
-
-* Create build image on production server
-    ```bash
-    docker image load -i getoutfit.tar
-    rm getoutfit.tar
-    docker run --name GetOutfit_build -p8888:8888 -d -w/GetOutfit getoutfit_build swift run -c release
-    docker logs -f GetOutfit_build
-    # after the server has been compiled & started press Ctrl-C on Linux or Cmd-. on macOS
-    docker stop GetOutfit_build
-    
-    ```
-  
-* Create release image on production server
-  ```bash
-  docker commit GetOutfit_build getoutfit_release
-  docker rm GetOutfit_build
-  docker rmi getoutfit_build
-  ```
-  
-* Load and run docker image on production server
+* Run Redis caching server
 ```bash
- docker stop GetOutfit && docker rm GetOutfit && docker rmi getoutfit && docker tag getoutfit_release getoutfit && docker run --name GetOutfit -p80:8888 -d -w/GetOutfit getoutfit swift run -c release
- docker rmi getoutfit_release
+docker network create redis # docker network ls
+docker run --name redis --network redis -d redis redis-server --appendonly yes
+```
+
+* Run Get Outfit Server from docker image
+```bash
+docker run --name GetOutfit --network redis -p80:8888 -d -w/GetOutfit getoutfit swift run -c release
+ ```
+ 
+ * Watch Get Outfit Server
+ ```bash
+ docker logs -f GetOutfit
  ```
 
 ## Format of Sources/Server/Models/RemoteShop+Data.swift
@@ -138,6 +122,7 @@ extension RemoteShop {
 - [/params](http://server.getoutfit.ru/params) Returns the list of all parameters
   - [?count=true](http://server.getoutfit.ru/params?count=true) Returns the number of parameters instead of their list
 - [/prices](http://server.getoutfit.ru/prices) Returns the range of prices for all offers
+- [/server](http://server.getoutfit.ru/server) Returns JSON with new server if it has been changed: {"server": "http://server.getoutfit.ru"} 
 - [/update](http://server.getoutfit.ru/update) Runs an update of shopping catalogue if last update is older than 24 hours
 
 Categories and offers can be filtered by a combination of parameters.
