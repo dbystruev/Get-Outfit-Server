@@ -582,6 +582,13 @@ func setup(_ router: Router) {
         next()
     }
     
+    // MARK: - GET /server
+    router.get("/server") { request, response, next in
+        response.send(json: ["server": "http://37.18.100.119/"])
+        
+        next()
+    }
+    
     // MARK: - GET /stylist
     router.get("/stylist") { request, response, next in
         var context: [String: String] = [:]

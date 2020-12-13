@@ -55,7 +55,7 @@ class RedisMiddleware: RouterMiddleware {
             }
             
             #if DEBUG
-            Log.debug("Value for \(key) is found in cache: \(value)")
+            Log.debug("Value for \(key) is found in cache, length: \(value.count)")
             #endif
             
             do {
@@ -80,7 +80,7 @@ class RedisMiddleware: RouterMiddleware {
             }
             
             #if DEBUG
-            Log.debug("Value \(value) for \(key) is set")
+            Log.debug("Value with length \(value.count) for \(key) is set")
             #endif
         }
     }
