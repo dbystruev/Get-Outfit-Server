@@ -39,7 +39,7 @@ class RedisMiddleware: RouterMiddleware {
     
     static func handle(request: RouterRequest, response: RouterResponse, next: @escaping () -> Void) throws {
         let key = getKey(for: request)
-        RedisManager.redis.get(key) { value, error in
+        RedisManager.get(key) { value, error in
             guard let value = value?.asString else {
                 if let error = error {
                     Log.error("Redis error: \(error)")
@@ -72,7 +72,7 @@ class RedisMiddleware: RouterMiddleware {
     ///   - value: value to set
     static func set(request: RouterRequest, value: String) {
         let key = getKey(for: request)
-        RedisManager.redis.set(key, value: value) { success, error in
+        RedisManager.set(key, value: value) { success, error in
             guard success else {
                 let message = error?.localizedDescription ?? "host \(RedisManager.host), port \(RedisManager.port)"
                 Log.error("Redis error: \(message)")
