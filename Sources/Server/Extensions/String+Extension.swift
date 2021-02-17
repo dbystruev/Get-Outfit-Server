@@ -8,7 +8,7 @@ import Foundation
 
 extension String {
     var lowercasedLetters: String {
-        filter { $0.isLowercase }
+        lowercased().filter { $0.isLowercase }
     }
     
     var toDate: Date? {
@@ -24,6 +24,6 @@ extension String {
     }
     
     var uppercasedLetters: String {
-        filter { $0.isUppercase }
+        uppercased().filter { $0.isUppercase }
     }
 }
