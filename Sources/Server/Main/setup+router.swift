@@ -467,12 +467,12 @@ func setup(_ router: Router) {
         
         // MARK: "vendor"
         if let vendors = request.queryParametersMultiValues["vendor"]?.compactMap({
-            $0.isEmpty ? nil : $0.lowercased()
+            $0.isEmpty ? nil : $0.lowercasedLetters
         }),
         !vendors.isEmpty
         {
             offers = offers.filter({ offer in
-                if let vendor = offer.vendor?.lowercased() {
+                if let vendor = offer.vendor?.lowercasedLetters {
                     return vendors.first(where: { vendor.contains($0) }) != nil
                 }
                 return false

@@ -7,6 +7,10 @@
 import Foundation
 
 extension String {
+    var lowercasedLetters: String {
+        filter { $0.isLowercase }
+    }
+    
     var toDate: Date? {
         let formats = ["yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm", "yyyy-MM-dd", "yyyy-MM"]
         let formatter = DateFormatter()
@@ -17,5 +21,9 @@ extension String {
             }
         }
         return nil
+    }
+    
+    var uppercasedLetters: String {
+        filter { $0.isUppercase }
     }
 }
