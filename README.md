@@ -4,6 +4,12 @@ Server for [Get Outfit](https://getoutfit.ru)
 
 iOS client: [github.com/dbystruev/Outfit-Selection](https://github.com/dbystruev/Outfit-Selection)
 
+* Stop and remove the previous Get Outfit Server if needed
+  ```bash
+  docker stop GetOutfit
+  docker rm GetOutfit
+  ```
+  
 * Install Get Outfit Server as docker image
   ```bash
   docker run -p80:8888 -it --name GetOutfit -w/GetOutfit swift bash
@@ -123,8 +129,9 @@ extension RemoteShop {
 - [/params](http://server.getoutfit.ru/params) Returns the list of all parameters
   - [?count=true](http://server.getoutfit.ru/params?count=true) Returns the number of parameters instead of their list
 - [/prices](http://server.getoutfit.ru/prices) Returns the range of prices for all offers
-- [/server](http://server.getoutfit.ru/server) Returns JSON with new server if it has been changed: {"server": "http://server.getoutfit.ru"} 
+- [/server](http://server.getoutfit.ru/server) Returns a JSON with the new server if it has been changed: {"server": "http://server.getoutfit.ru"} 
 - [/update](http://server.getoutfit.ru/update) Runs an update of shopping catalogue if last update is older than 24 hours
+- [/vendors](http://server.getoutfit.ru/vendors) Returns a JSON with the list of vendors present in offers sorted alphabetically
 
 Categories and offers can be filtered by a combination of parameters.
 
