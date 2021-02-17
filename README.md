@@ -13,6 +13,7 @@ iOS client: [github.com/dbystruev/Outfit-Selection](https://github.com/dbystruev
   vi Sources/Server/Models/RemoteShop+Data.swift # fill with your real Admitad data (see below)
   exit
   docker commit GetOutfit getoutfit
+  docker stop GetOutfit
   docker rm GetOutfit
   ```
 

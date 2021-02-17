@@ -466,11 +466,6 @@ func setup(_ router: Router) {
         }
         
         // MARK: "vendor"
-        // if let vendor = request.queryParameters["vendor"] {
-        //   offers = offers.filter { $0.vendor?.lowercased().contains(vendor.lowercased()) == true }
-        // }
-        
-        // MARK: "vendors"
         if let vendors = request.queryParametersMultiValues["vendor"]?.compactMap({
             $0.isEmpty ? nil : $0.lowercased()
         }),
@@ -617,6 +612,18 @@ func setup(_ router: Router) {
     router.get("/update") { request, response, next in
         updateCatalog()
         response.send(json: ["date": catalog.date?.toString])
+        next()
+    }
+    
+    // MARK: - GET /vendors
+    router.get("/vendors") { request, response, next in
+        let offers = catalog.shop?.offers
+        
+        if let allVendors = offers?.compactMap({ $0.vendor }) {
+            let uniqueVendors = Array(Set(allVendors)).sorted()
+            response.send(json: ["vendors": uniqueVendors])
+        }
+        
         next()
     }
 }
