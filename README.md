@@ -4,10 +4,11 @@ Server for [Get Outfit](https://getoutfit.ru)
 
 iOS client: [github.com/dbystruev/Outfit-Selection](https://github.com/dbystruev/Outfit-Selection)
 
-* Stop and remove the previous Get Outfit Server if needed
+* Stop and remove the previous Get Outfit Server docker container and its image if needed
   ```bash
   docker stop GetOutfit
   docker rm GetOutfit
+  docker rmi getoutfit
   ```
   
 * Install Get Outfit Server as docker image

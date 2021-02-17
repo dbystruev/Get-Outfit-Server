@@ -471,12 +471,29 @@ func setup(_ router: Router) {
         }),
         !vendors.isEmpty
         {
-            offers = offers.filter({ offer in
-                if let vendor = offer.vendor?.lowercasedLetters {
-                    return vendors.first(where: { vendor.contains($0) }) != nil
+            var maxOffersByVendor = 0
+            var offersByVendor = [String: [YMLOffer]]()
+            
+            for offer in offers {
+                guard let offerVendor = offer.vendor?.lowercasedLetters else { continue }
+                for vendor in vendors {
+                    if offerVendor.contains(vendor) == true {
+                        let offers = offersByVendor[vendor, default: []] + [offer]
+                        maxOffersByVendor = max(maxOffersByVendor, offers.count)
+                        offersByVendor[vendor] = offers
+                    }
                 }
-                return false
-            })
+            }
+            
+            offers.removeAll()
+            
+            for index in 0 ..< maxOffersByVendor {
+                for vendor in vendors {
+                    guard let offersForVendor = offersByVendor[vendor] else { continue }
+                    guard index < offersForVendor.count else { continue }
+                    offers.append(offersForVendor[index])
+                }
+            }
         }
         
         // MARK: "vendorCode"
