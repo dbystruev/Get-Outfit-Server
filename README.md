@@ -4,40 +4,66 @@ Server for [Get Outfit](https://getoutfit.ru)
 
 iOS client: [github.com/dbystruev/Outfit-Selection](https://github.com/dbystruev/Outfit-Selection)
 
-* Stop and remove the previous Get Outfit Server docker container and its image if needed
-  ```bash
-  docker stop GetOutfit
-  docker rm GetOutfit
-  docker rmi getoutfit
-  ```
-  
-* Install Get Outfit Server as docker image
-  ```bash
-  docker run -p80:8888 -it --name GetOutfit -w/GetOutfit swift bash
-  git clone https://github.com/dbystruev/Get-Outfit-Server.git .
-  apt update && apt -y upgrade
-  apt -y install openssl libssl-dev libmysqlclient-dev libcurl4-openssl-dev vim
-  vi Sources/Server/Models/RemoteShop+Data.swift # fill with your real Admitad data (see below)
-  exit
-  docker commit GetOutfit getoutfit
-  docker stop GetOutfit
-  docker rm GetOutfit
-  ```
-
+## Redis and NGINX Installation
 * Run Redis caching server
 ```bash
 docker network create redis # docker network ls
 docker run --name redis --network redis -d redis redis-server --appendonly yes
 ```
 
+* Run NGINX as proxy
+```bash
+docker run --name nginx --network redis -p80:80 -d nginx
+docker exec -it nginx bash
+apt update && apt -y upgrade
+apt install vim
+vi /etc/nginx/conf.d/default.conf
+```
+
+* Make changes in /etc/nginx/conf.d/default.conf and exit with `:wq`
+```
+location / {
+	proxy_pass http://getoutfit:8888;
+}
+```
+
+* Reload nginx configuration
+
+```bash
+nginx -s reload
+exit
+```
+
+## Get Outfit Server Installation
+
+* Stop and remove the previous Get Outfit Server docker container and its image if needed
+  ```bash
+  docker stop getoutfit
+  docker rm getoutfit
+  docker rmi getoutfit
+  ```
+  
+* Install Get Outfit Server as docker image
+  ```bash
+  docker run -p80:8888 -it --name getoutfit -w/GetOutfit swift bash
+  git clone https://github.com/dbystruev/Get-Outfit-Server.git .
+  apt update && apt -y upgrade
+  apt -y install openssl libssl-dev libmysqlclient-dev libcurl4-openssl-dev vim
+  vi Sources/Server/Models/RemoteShop+Data.swift # fill with your real Admitad data (see below)
+  exit
+  docker commit getoutfit getoutfit
+  docker stop getoutfit
+  docker rm getoutfit
+  ```
+
 * Run Get Outfit Server from docker image
 ```bash
-docker run --name GetOutfit --network redis -p80:8888 -d -w/GetOutfit getoutfit swift run -c release
+docker run --name getoutfit --network redis -p80:8888 -d -w/GetOutfit getoutfit swift run -c release
  ```
  
  * Watch Get Outfit Server
  ```bash
- docker logs -f GetOutfit
+ docker logs -f getoutfit
  ```
 
 ## Format of Sources/Server/Models/RemoteShop+Data.swift
