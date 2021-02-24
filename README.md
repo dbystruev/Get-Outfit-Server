@@ -45,7 +45,7 @@ exit
   
 * Install Get Outfit Server as docker image
   ```bash
-  docker run -p80:8888 -it --name getoutfit -w/GetOutfit swift bash
+  docker run -it --name getoutfit -w/GetOutfit swift bash
   git clone https://github.com/dbystruev/Get-Outfit-Server.git .
   apt update && apt -y upgrade
   apt -y install openssl libssl-dev libmysqlclient-dev libcurl4-openssl-dev vim
@@ -58,7 +58,7 @@ exit
 
 * Run Get Outfit Server from docker image
 ```bash
-docker run --name getoutfit --network redis -p80:8888 -d -w/GetOutfit getoutfit swift run -c release
+docker run --name getoutfit --network redis -d -w/GetOutfit getoutfit swift run -c release
  ```
  
  * Watch Get Outfit Server
