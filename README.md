@@ -21,7 +21,7 @@ vi /etc/nginx/conf.d/default.conf
 ```
 
 * Make changes in /etc/nginx/conf.d/default.conf and exit with `:wq`
-```
+```nginx
 location / {
 	proxy_pass http://getoutfit:8888;
 }
