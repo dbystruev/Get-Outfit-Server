@@ -17,7 +17,7 @@ import SwiftRedis
 #endif
 
 let catalog = YMLCatalog()
-let remoteShop = RemoteShop.last! // 0 – Lamoda, 1 — Farfetch, 2 — Acoola
+let remoteShop = RemoteShop.all.last! // 0 – Lamoda, 1 — Farfetch, 2 — Acoola
 let router = Router()
 let xmlManager = XMLManager()
 
