@@ -7,11 +7,13 @@
 import Foundation
 
 extension URL {
-    func withQueries(_ queries: [String: String]) -> URL? {
+    func withQueries(_ queries: [String: String?]) -> URL? {
         var components = URLComponents(url: self, resolvingAgainstBaseURL: true)
         var queryItems = components?.queryItems ?? []
         for query in queries {
-            queryItems += [URLQueryItem(name: query.key, value: query.value)]
+            if let queryValue = query.value {
+                queryItems += [URLQueryItem(name: query.key, value: queryValue)]
+            }
         }
         components?.queryItems = queryItems
         return components?.url
