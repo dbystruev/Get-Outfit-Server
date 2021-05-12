@@ -100,10 +100,10 @@ class XMLManager: NSObject {
     
     var lastImport: Date? {
         get {
-            guard let lastImport = remoteParameters["last_import"] else { return nil }
+            guard let lastImport = remoteParameters["last_import"], let lastImportDate = lastImport else { return nil }
             let formatter = DateFormatter()
             formatter.dateFormat = "yyyy.MM.dd.HH.mm"
-            return formatter.date(from: lastImport)
+            return formatter.date(from: lastImportDate)
         }
         set {
             guard let date = newValue else { return }
