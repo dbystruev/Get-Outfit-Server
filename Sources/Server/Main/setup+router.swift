@@ -596,7 +596,8 @@ func setup(_ router: Router) {
     
     // MARK: - GET /server
     router.get("/server") { request, response, next in
-        response.send(json: ["server": "http://server.getoutfit.ru"])
+//        response.send(json: ["server": "http://server.getoutfit.ru"])
+        response.send(json: ["server": "http://spb.getoutfit.co:8888"])
         
         next()
     }
