@@ -1,0 +1,8 @@
+{
+    "Bid": {
+        "amount": "int",
+        "createdAt": "date",
+        "email": "string",
+        "name": "string"
+    }
+}
